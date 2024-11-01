@@ -1,7 +1,6 @@
 import User from '../models/user.model.js'; 
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { setToken } from '../helper/setToken.js';
+import { sendOTP } from './otp.controller.js';
 
 export const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -15,11 +14,8 @@ export const registerUser = async (req, res) => {
     const user = new User({ username, email, password });
     await user.save();
 
-    const userId = user._id;
+    await sendOTP(req, res);
 
-    setToken(res,{userId});
-
-    res.status(201).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Server error', error });
   }
@@ -39,8 +35,12 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    if (!user.isVerified) {
+      return sendOTP(req, res); 
+    }
+
     const userId = user._id;
-    setToken(res,{userId});
+    setToken(res, { userId });
 
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -48,13 +48,13 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-    try {
-      res.clearCookie('token'); 
-      res.json({ message: 'Logged out successfully' });
-    } catch (error) {
-      res.status(500).json({ error: 'Server error', error });
-    }
-  };
+  try {
+    res.clearCookie('token'); 
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error', error });
+  }
+};
 
 export const getProfile = async (req, res) => {
   try {

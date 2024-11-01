@@ -1,12 +1,15 @@
 import express from "express"
 import { isAuthenticated } from "../middlewares/isAuth.js";
 import { getProfile, loginUser, logoutUser, registerUser } from "../controllers/auth.controller.js";
+import { verifyOTP } from "../controllers/otp.controller.js";
 
 const router = express.Router();
 
 router.post('/register',registerUser);
 
 router.post('/login',loginUser);
+
+router.post('/verify-otp', verifyOTP);
 
 router.get('/logout',isAuthenticated,logoutUser);
 
