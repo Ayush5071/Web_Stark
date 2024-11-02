@@ -53,21 +53,26 @@ export const sendOTP = async (req, res) => {
 
 
 export const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  const { otp } = req.body;
+  const { id : userId} = req.params;
 
   try {
-    console.log("Verifying OTP for email:", email);
-
-    const user = await User.findOne({ email });
+    const user = await User.findById(userId);
+    const { email } = user;
+    console.log("mila",user);
+    
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
     }
 
+    console.log("Verifying OTP for email:", email);
+
     const otpEntry = await OTP.findOne({ userId: user._id, otp });
+
     if (!otpEntry) {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
-
+    
     const now = new Date();
     const expiresAt = new Date(otpEntry.createdAt);
     expiresAt.setMinutes(expiresAt.getMinutes() + 10);
@@ -76,6 +81,9 @@ export const verifyOTP = async (req, res) => {
       await OTP.deleteOne({ _id: otpEntry._id });
       return res.status(400).json({ message: 'OTP has expired' });
     }
+
+    user.isVerified = true;
+    await user.save();
 
     await OTP.deleteOne({ _id: otpEntry._id });
     return res.status(200).json({ message: 'OTP verified successfully' });

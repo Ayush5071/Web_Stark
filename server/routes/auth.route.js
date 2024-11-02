@@ -9,7 +9,7 @@ router.post('/register',registerUser);
 
 router.post('/login',loginUser);
 
-router.post('/verify-otp', verifyOTP);
+router.post('/verify-otp/:id', verifyOTP);
 
 router.get('/logout',isAuthenticated,logoutUser);
 
