@@ -15,6 +15,7 @@ export const registerUser = async (req, res) => {
     await user.save();
 
     await sendOTP(req, res);
+    res.status(200).json(user);
 
   } catch (error) {
     res.status(500).json({ error: 'Server error', error });
@@ -25,7 +26,9 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log(email,password, "check 1");
     const user = await User.findOne({ email });
+    console.log("chek",user)
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -39,8 +42,12 @@ export const loginUser = async (req, res) => {
       return sendOTP(req, res); 
     }
 
+    console.log(isMatch," match")
+
     const userId = user._id;
     setToken(res, { userId });
+
+    res.status(200).json(user);
 
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
