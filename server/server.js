@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import auctionRoutes from './routes/auction.route.js';
 
 import { connectDb } from './db/connectDb.js';
 import cookieParser from 'cookie-parser';
@@ -17,6 +18,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use("/api/message",messageRoutes);
+app.use("/api/auction",auctionRoutes);
 
 const PORT = process.env.PORT || 4000;
 

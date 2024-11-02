@@ -7,7 +7,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: ["http://localhost:5173", "http://localhost:5174"], 
         methods: ["GET", "POST"],
         credentials: true,
     }
@@ -21,14 +21,20 @@ export const getReceiverSocketId = (receiverId) => {
 
 io.on('connection', (socket) => {
     console.log("A user connected:", socket.id);
-    
+
     const userId = socket.handshake.query.userId;
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id;
     }
-    
+
     // Emit the list of online users to all clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+    // Listen for bid placement
+    socket.on("placeBid", (bidData) => {
+        // telling all connected users
+        io.emit("bidUpdate", bidData);
+    });
 
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);

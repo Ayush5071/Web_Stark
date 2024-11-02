@@ -1,20 +1,38 @@
 import mongoose from 'mongoose';
 
 const auctionSchema = new mongoose.Schema({
-  products: [
-    {
-      product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true,
-      },
-      basePrice: {
-        type: Number,
-        required: true,
-      },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  startingPrice: {
+    type: Number,
+    required: true,
+  },
+  highestBid: {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
-  ],
-  owner: {
+    amount: {
+      type: Number,
+      default: 0,
+    },
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
@@ -25,14 +43,18 @@ const auctionSchema = new mongoose.Schema({
   },
 });
 
-auctionSchema.statics.createAuction = async function (products, owner) {
-  const auction = new this({
-    products,
-    owner,
-  });
-  return auction.save();
+
+// method which can handle the endTime with respect to current time -- ! so just add time in min formwhich you need to open auction
+auctionSchema.methods.setEndTime = function (durationInMinutes) {
+  const endTime = new Date();
+  endTime.setMinutes(endTime.getMinutes() + durationInMinutes);
+  this.endTime = endTime;
+};
+
+// method to find auctions thta are active !!
+auctionSchema.statics.getActiveAuctions = function () {
+  return this.find({ active: true }).exec();
 };
 
 const Auction = mongoose.model('Auction', auctionSchema);
-
 export default Auction;
