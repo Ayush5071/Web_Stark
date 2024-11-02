@@ -16,7 +16,7 @@ const router = express.Router();
 
 // Configure Cloudinary Storage
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary.v2, // Use cloudinary.v2 to access the correct configuration
+    cloudinary: cloudinary.v2,
     params: {
         folder: 'uploads', // Specify folder name in Cloudinary
         allowed_formats: ['jpg', 'png', 'jpeg'], // Allowed formats
