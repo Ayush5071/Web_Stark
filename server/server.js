@@ -6,6 +6,11 @@ import { connectDb } from './db/connectDb.js';
 import adroutes from './routes/ad.routes.js';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import auctionRoutes from './routes/auction.route.js';
+
+import { connectDb } from './db/connectDb.js';
+import cookieParser from 'cookie-parser';
+
 import { app, server } from "./socket/socket.js";
 
 
@@ -20,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/ad', adroutes);
 
 app.use("/api/message",messageRoutes);
+app.use("/api/auction",auctionRoutes);
 
 
 const PORT = process.env.PORT || 4000;

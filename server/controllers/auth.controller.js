@@ -14,6 +14,9 @@ export const registerUser = async (req, res) => {
     const user = new User({ username, email, password });
     await user.save();
 
+    const userId = user._id;
+    setToken(res, { userId });
+    
     await sendOTP(req, res);
     res.status(200).json(user);
 
