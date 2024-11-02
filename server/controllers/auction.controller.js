@@ -31,3 +31,38 @@ export const getActiveAuctions = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+export const placeBid = async (req, res, io) => {
+    try {
+      const { bidAmount } = req.body;
+      const {id : auctionId} =  req.params
+      const userId = req.user._id;
+  
+      const auction = await Auction.findById(auctionId);
+  
+      if (!auction) {
+        return res.status(404).json({ error: 'Auction not found' });
+      }
+  
+      if (new Date() > auction.endTime) {
+        return res.status(400).json({ error: 'Bidding time has expired' });
+      }
+  
+      await auction.placeBid(userId, bidAmount);
+  
+      // emit highest bid to all of te user prsnt;
+      io.emit('newBid', {
+        auctionId,
+        highestBid: {
+          userId,
+          amount: bidAmount,
+        },
+      });
+  
+      return res.status(200).json({ message: 'Bid placed successfully', auction });
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      return res.status(500).json({ error: "Something went wrong", error });
+    }
+};

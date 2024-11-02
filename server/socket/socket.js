@@ -21,20 +21,14 @@ export const getReceiverSocketId = (receiverId) => {
 
 io.on('connection', (socket) => {
     console.log("A user connected:", socket.id);
-
+    
     const userId = socket.handshake.query.userId;
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id;
     }
-
+    
     // Emit the list of online users to all clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
-
-    // Listen for bid placement
-    socket.on("placeBid", (bidData) => {
-        // telling all connected users
-        io.emit("bidUpdate", bidData);
-    });
 
     socket.on("disconnect", () => {
         console.log("User disconnected:", socket.id);

@@ -56,5 +56,13 @@ auctionSchema.statics.getActiveAuctions = function () {
   return this.find({ active: true }).exec();
 };
 
+auctionSchema.methods.placeBid = function(userId, bidAmount) {
+  if (bidAmount <= this.highestBid.amount) {
+    throw new Error('Bid must be higher than the current highest bid');
+  }
+  this.highestBid = { user: userId, amount: bidAmount };
+  return this.save();
+};
+
 const Auction = mongoose.model('Auction', auctionSchema);
 export default Auction;
