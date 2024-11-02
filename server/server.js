@@ -8,9 +8,6 @@ import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import auctionRoutes from './routes/auction.route.js';
 
-import { connectDb } from './db/connectDb.js';
-import cookieParser from 'cookie-parser';
-
 import { app, server } from "./socket/socket.js";
 
 
