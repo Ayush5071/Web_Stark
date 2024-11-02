@@ -1,11 +1,11 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import authRoutes from './routes/auth.route.js';
-import { connectDb } from './db/connectDb.js';
 import cookieParser from 'cookie-parser';
-
+import dotenv from 'dotenv';
+import express from 'express';
+import { connectDb } from './db/connectDb.js';
+import adroutes from './routes/ad.routes.js';
+import authRoutes from './routes/auth.route.js';
 dotenv.config();
-connectDb();
+await connectDb();
 
 
 const app = express();
@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/ad', adroutes);
 
 const PORT = process.env.PORT || 4000;
 
