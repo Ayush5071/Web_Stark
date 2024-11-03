@@ -7,7 +7,7 @@ router.post('/create',isAuthenticated,createAuction);
 
 router.get('/active',isAuthenticated,getActiveAuctions);
 
-router.get('/bid',isAuthenticated,placeBid);
+router.post('/bid/:id',isAuthenticated,placeBid);
 
 
 export default router;

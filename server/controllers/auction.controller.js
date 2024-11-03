@@ -1,4 +1,5 @@
 import Auction from "../models/auction.model.js";
+import { io } from "../socket/socket.js";
 
 export const createAuction = async (req, res) => {
   try {
@@ -33,11 +34,11 @@ export const getActiveAuctions = async (req, res) => {
 };
 
 
-export const placeBid = async (req, res, io) => {
+export const placeBid = async (req, res) => {
     try {
       const { bidAmount } = req.body;
       const {id : auctionId} =  req.params
-      const userId = req.user._id;
+      const userId = req.user._id; 
   
       const auction = await Auction.findById(auctionId);
   
@@ -49,7 +50,12 @@ export const placeBid = async (req, res, io) => {
         return res.status(400).json({ error: 'Bidding time has expired' });
       }
   
-      await auction.placeBid(userId, bidAmount);
+      try {
+        await auction.placeBid(userId, bidAmount);        
+      } catch (error) {
+        // console.log(error)
+        return res.status(400).json({error : "bid must be higher than current bid"});        
+      }
   
       // emit highest bid to all of te user prsnt;
       io.emit('newBid', {
