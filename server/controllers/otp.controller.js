@@ -1,33 +1,33 @@
 import OTP from '../models/otp.model.js';
 import nodemailer from 'nodemailer';
 import User from '../models/user.model.js';
+import dotenv from "dotenv";
 
+dotenv.config();
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for port 465, false for other ports
-    auth: {
-      user: 'lazaro.kessler69@ethereal.email',
-      pass: 'eVVQAKdUyFNfm9bhy6',
-    },
-  });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER, 
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export const sendOTP = async (req, res) => {
   const { email } = req.body;
 
   try {
+    console.log("Searching for user with email:", email);
     const user = await User.findOne({ email });
-    // console.log("ye to ho gya",user);
     if (!user) {
+      console.log("User not found.");
       return res.status(400).json({ message: 'User not found' });
     }
 
     const otpEntry = new OTP({ userId: user._id });
-    // console.log("new Otp",otpEntry);
     const otp = otpEntry.generateOTP();
-    await otpEntry.save(); 
-    // console.log("dooooooooooneeeeeeeeeeeeeeeeeeeeeeeeee");
+    await otpEntry.save();
+    console.log("Generated OTP:", otp);
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -36,40 +36,63 @@ export const sendOTP = async (req, res) => {
       text: `Your OTP code is: ${otp}`,
     };
 
-    console.log("mail options",mailOptions);
-    console.log(process.env.EMAIL_USER,"recheck-->",process.env.EMAIL_PASS);
+    console.log("Sending email with options:", mailOptions);
 
     await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully.");
 
-    console.log("khatam");
-
-    res.status(200).json({ message: 'OTP sent to your email' });
+    return;
   } catch (error) {
-    res.status(500).json({ message: 'Error sending OTP', error });
+    console.error("Error in sendOTP function:", error);
+
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Error sending OTP', error });
+    }
   }
 };
 
+
 export const verifyOTP = async (req, res) => {
-  const { userId, otp } = req.body;
+  const { otp } = req.body;
+  const { id : userId} = req.params;
 
   try {
-    const otpDoc = await OTP.findOne({ userId });
-
-    if (!otpDoc || otpDoc.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+    const user = await User.findById(userId);
+    const { email } = user;
+    console.log("mila",user);
+    
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
     }
 
-    const currentTime = Date.now();
-    if (currentTime > otpDoc.createdAt.getTime() + 5 * 60 * 1000) { 
+    console.log("Verifying OTP for email:", email);
+
+    const otpEntry = await OTP.findOne({ userId: user._id, otp });
+
+    if (!otpEntry) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+    
+    const now = new Date();
+    const expiresAt = new Date(otpEntry.createdAt);
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+    if (now > expiresAt) {
+      await OTP.deleteOne({ _id: otpEntry._id });
       return res.status(400).json({ message: 'OTP has expired' });
     }
 
-    await User.findByIdAndUpdate(userId, { isVerified: true });
+    user.isVerified = true;
+    await user.save();
 
-    await OTP.deleteOne({ userId });
+    await OTP.deleteOne({ _id: otpEntry._id });
+    return res.status(200).json({ message: 'OTP verified successfully' });
 
-    res.status(200).json({ message: 'OTP verified successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'OTP verification failed', error });
+    console.error("Error in verifyOTP function:", error);
+
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Error verifying OTP', error });
+    }
   }
 };

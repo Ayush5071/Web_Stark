@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
 export const setToken = (res, { userId }) => {
-    console.log("scrap col hai -- ", role);
     const token = jwt.sign({ userId: userId }, process.env.JWT_SECRET, {
         expiresIn: '1h'
     });
