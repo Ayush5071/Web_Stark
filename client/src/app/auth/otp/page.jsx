@@ -6,16 +6,15 @@ import { verifyOTP } from "@/lib/authApi/api";
 
 function Otp() {
   const router = useRouter();
-  const { auth, setVerified, setAuth } = useAuthContext(); // Destructure auth from context
+  const { auth, setVerified, setAuth } = useAuthContext();
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true); 
 
-  // Check if the user ID is available in the auth context
   const userId = auth?._id; 
   console.log(userId, "This is the auth context data");
 
   useEffect(() => {
-    setLoading(false); // Set loading to false after mounting
+    setLoading(false); 
   }, []);
 
   const handleOtpSubmit = async (e) => {
@@ -33,7 +32,7 @@ function Otp() {
       if (response) {
         setVerified(true);
         setAuth(response);
-        router.push("/"); // Redirect to homepage after verification
+        router.push("/");
       } else {
         console.log("OTP verification error:", response);
       }
@@ -42,9 +41,8 @@ function Otp() {
     }
   };
 
-  // Render loading state or OTP form based on the loading state
   if (loading) {
-    return <p>Loading...</p>; // You can replace this with a loader component if needed
+    return <p>Loading...</p>; 
   }
 
   return (
