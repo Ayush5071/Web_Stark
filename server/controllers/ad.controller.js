@@ -1,9 +1,8 @@
 import Ad from '../models/ad.model.js';
-import cloudinary from '../helper/coudinaryConfig.js';
 
 export const getad = async (req, res) => {
     try {
-        const ads = await Ad.find(); // Fetch all ads from the database
+        const ads = await Ad.find(); 
         if (!ads) {
             return res.status(404).json({
                 message: "No ads found"
@@ -35,7 +34,6 @@ export const postad = async (req, res) => {
             });
         }
 
-        // Create a new ad with the image URL
         const newad = new Ad({
             title,
             description,
@@ -44,7 +42,6 @@ export const postad = async (req, res) => {
             productType,
             location,
             seller,
-            // object of seller should be in rebody
         });
 
         const response = await newad.save();
@@ -61,4 +58,3 @@ export const postad = async (req, res) => {
     }
 }
 
-// export default {getad,postad}
