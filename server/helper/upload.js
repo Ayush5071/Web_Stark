@@ -14,19 +14,16 @@ cloudinary.v2.config({
 
 const router = express.Router();
 
-// Configure Cloudinary Storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary.v2,
     params: {
-        folder: 'uploads', // Specify folder name in Cloudinary
-        allowed_formats: ['jpg', 'png', 'jpeg'], // Allowed formats
+        folder: 'uploads',
+        allowed_formats: ['jpg', 'png', 'jpeg'],
     },
 });
 
-// Initialize multer with Cloudinary storage
 export const upload = multer({ storage: storage });
 
-// Upload route
 router.post('/upload', upload.single('image'), (req, res) => {
     console.log('Image upload route called');
 
@@ -35,7 +32,6 @@ router.post('/upload', upload.single('image'), (req, res) => {
     }
 
     try {
-        // Access the Cloudinary URL directly from req.file.path
         return res.status(200).json({ imageurl: req.file.path });
     } catch (error) {
         console.error('Error uploading image:', error);
