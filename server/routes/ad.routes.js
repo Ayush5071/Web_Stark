@@ -1,12 +1,19 @@
-import express from 'express'
-import { getad, postad } from '../controllers/ad.controller.js'
-import { upload } from '../helper/upload.js'
-import { isAuthenticated } from '../middlewares/isAuth.js'
-const router = express.Router()
+import express from 'express';
+import { isAuthenticated } from '../middlewares/isAuth.js';
+import { deleteAd, getAd, getMyAd, getMyPurchasedAds, markAsSold, postAd } from '../controllers/ad.controller.js';
 
-router.get('/getad',isAuthenticated, getad)
+const router = express.Router();
 
-// for creating ad
-router.post('/postad', isAuthenticated, upload.single('image'), postad);
+router.get('/', getAd);
+
+router.post('/', isAuthenticated, postAd);
+
+router.get('/myAd', isAuthenticated, getMyAd);
+router.patch('/sold/:adId', isAuthenticated, markAsSold);
+
+router.get('/mypurchases', isAuthenticated, getMyPurchasedAds);
+router.delete('/:adId', isAuthenticated, deleteAd);
+
+
 
 export default router;

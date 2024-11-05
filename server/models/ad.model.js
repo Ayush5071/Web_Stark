@@ -11,7 +11,7 @@ const adSchema = new mongoose.Schema({
   },
   imageurl: {
     type: String,
-    required:true,
+    required: true,
   },
   price: {
     type: Number,
@@ -53,6 +53,11 @@ const adSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  status: {
+    type: String,
+    enum: ['active', 'sold'], 
+    default: 'active',
+  },
 });
 
 adSchema.methods.addReview = function (user, comment) {
@@ -61,16 +66,15 @@ adSchema.methods.addReview = function (user, comment) {
 };
 
 adSchema.methods.likeAd = function (userId) {
-    const likeIndex = this.likes.findIndex((like) => like.user.toString() === userId.toString());
-    
-    if (likeIndex !== -1) {
-      this.likes.splice(likeIndex, 1);
-    } else {
-      this.likes.push({ user: userId });
-    }  
-    return this.save(); 
-  };
-  
+  const likeIndex = this.likes.findIndex((like) => like.user.toString() === userId.toString());
+
+  if (likeIndex !== -1) {
+    this.likes.splice(likeIndex, 1);
+  } else {
+    this.likes.push({ user: userId });
+  }
+  return this.save();
+};
 
 const Ad = mongoose.model('Ad', adSchema);
 
