@@ -31,7 +31,7 @@ export const loginUser = async (req, res) => {
   try {
     console.log(email,password, "check 1");
     const user = await User.findOne({ email });
-    console.log("chek",user)
+    console.log("chek",user);
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }

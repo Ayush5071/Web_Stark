@@ -1,10 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
+import { fetchAuthFromCookie } from "@/lib/authApi/api";
 
 function HomePage() {
   const router = useRouter();
   const { auth, verified } = useAuthContext();
+  const cookieData = fetchAuthFromCookie();
+  console.log(cookieData);
 
   console.log("Auth HOme",auth);
 

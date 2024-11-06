@@ -1,8 +1,11 @@
 import express from 'express';
 import { isAuthenticated } from '../middlewares/isAuth.js';
-import { addAdToStore, deleteStore, getAllStores, getMyStore, removeAdFromStore } from '../controllers/store.controller.js';
+import { addAdToStore, createStore, deleteStore, getAllStores, getMyStore, removeAdFromStore } from '../controllers/store.controller.js';
 
 const router = express.Router();
+
+
+router.post('/create', isAuthenticated, createStore);
 
 router.get('/mystore', isAuthenticated, getMyStore);
 

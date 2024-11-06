@@ -23,10 +23,9 @@ export const createAuction = async (req, res) => {
   }
 };
 
-// get all active auctions
 export const getActiveAuctions = async (req, res) => {
   try {
-    const activeAuctions = await Auction.getActiveAuctions(); // encapsulation is done for code check ---> auction model
+    const activeAuctions = await Auction.getActiveAuctions(); // encapsulation is done for code, check ---> auction model okay !!
     res.status(200).json(activeAuctions);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -38,7 +37,7 @@ export const placeBid = async (req, res) => {
     try {
       const { bidAmount } = req.body;
       const {id : auctionId} =  req.params
-      const userId = req.user._id; 
+      const userId = req.user.userId; 
   
       const auction = await Auction.findById(auctionId);
   

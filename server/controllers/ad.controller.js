@@ -9,10 +9,7 @@ export const getAd = async (req, res) => {
                 error: "No ads found"
             });
         }
-        return res.status(200).json({
-            message: "Ads fetched successfully",
-            ads
-        });
+        return res.status(200).json(ads);
     } catch (error) {
         console.error('Error fetching ads:', error);
         return res.status(500).json({
@@ -24,9 +21,12 @@ export const getAd = async (req, res) => {
 
 export const postAd = async (req, res) => {
     try {
+        console.log("yo")
         const { title, description, price, location, productType } = req.body;
         const imageurl = req.file.path;
         const seller = req.user.userId; 
+
+        console.log("img url",imageurl);
 
         const existingAd = await Ad.findOne({ title });
         if (existingAd) {
