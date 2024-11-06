@@ -1,9 +1,9 @@
 import Ad from "../models/ad.model.js";
-
+import User from "../models/user.model.js";
 
 export const getAd = async (req, res) => {
     try {
-        const ads = await Ad.find();
+        const ads = await Ad.find().populate('seller', 'username');  // Populate seller info
         if (!ads.length) {
             return res.status(404).json({
                 error: "No ads found"
@@ -21,12 +21,11 @@ export const getAd = async (req, res) => {
 
 export const postAd = async (req, res) => {
     try {
-        console.log("yo")
         const { title, description, price, location, productType } = req.body;
         const imageurl = req.file.path;
-        const seller = req.user.userId; 
+        const seller = req.user.userId;
 
-        console.log("img url",imageurl);
+        console.log("img url", imageurl);
 
         const existingAd = await Ad.findOne({ title });
         if (existingAd) {
@@ -47,15 +46,16 @@ export const postAd = async (req, res) => {
         });
 
         const response = await newAd.save();
-        return res.status(200).json({
-            message: "Ad created successfully",
-            ad: response
-        });
+
+        const user = await User.findById(seller);
+        user.ads.push(newAd._id);
+        await user.save();
+
+        return res.status(200).json(response);
     } catch (error) {
         console.error('Error in creating ad:', error);
         return res.status(500).json({
-            error: "Something went wrong in creating ad",
-            error
+            error: "Something went wrong in creating ad"
         });
     }
 };
@@ -63,7 +63,10 @@ export const postAd = async (req, res) => {
 export const getMyAd = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const myAds = await Ad.find({ seller: userId });
+        const myAds = await Ad.find({ seller: userId })
+            .populate('seller', 'username')  
+            .populate('likes.user', 'username') 
+            .populate('reviews.user', 'username'); 
 
         if (!myAds.length) {
             return res.status(404).json({
@@ -71,10 +74,7 @@ export const getMyAd = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
-            message: "User's ads fetched successfully",
-            myAds
-        });
+        return res.status(200).json(myAds);
     } catch (error) {
         console.error('Error fetching user ads:', error);
         return res.status(500).json({
@@ -98,13 +98,14 @@ export const markAsSold = async (req, res) => {
         }
 
         ad.status = 'sold';
-        ad.soldTo = buyerId;
+        ad.soldTo = buyerId; 
         await ad.save();
 
-        return res.status(200).json({
-            message: "Ad marked as sold",
-            ad
-        });
+        const user = await User.findById(buyerId);
+        user.purchasedAds.push(ad._id);
+        await user.save();
+
+        return res.status(200).json(ad);  
     } catch (error) {
         console.error('Error marking ad as sold:', error);
         return res.status(500).json({
@@ -114,29 +115,26 @@ export const markAsSold = async (req, res) => {
     }
 };
 
+
 export const getMyPurchasedAds = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const purchasedAds = await Ad.find({ soldTo: userId });
+        console.log(userId);
 
-        if (!purchasedAds.length) {
-            return res.status(404).json({
-                error: "No purchased ads found for this user"
-            });
-        }
+        const purchasedAds = await Ad.find({ soldTo: userId })
+            .populate('seller', 'username')  
+            .populate('likes.user', 'username')  
+            .populate('reviews.user', 'username'); 
 
-        return res.status(200).json({
-            message: "User's purchased ads fetched successfully",
-            purchasedAds
-        });
+        return res.status(200).json(purchasedAds || []);  
     } catch (error) {
         console.error('Error fetching purchased ads:', error);
         return res.status(500).json({
-            error: "Something went wrong while fetching user's purchased ads",
-            error
+            error: "Something went wrong while fetching user's purchased ads"
         });
     }
 };
+
 
 export const deleteAd = async (req, res) => {
     const { adId } = req.params;
@@ -159,13 +157,89 @@ export const deleteAd = async (req, res) => {
 
         await Ad.findByIdAndDelete(adId);
 
-        return res.status(200).json({
-            message: "Ad deleted successfully"
-        });
+        return res.status(200).json(ad); 
     } catch (error) {
         console.error('Error deleting ad:', error);
         return res.status(500).json({
             error: "Something went wrong while deleting the ad",
+            error
+        });
+    }
+};
+
+export const getActiveAds = async (req, res) => {
+    try {
+        const activeAds = await Ad.find({ status: 'active' })
+            .populate('seller', 'username');  
+        if (!activeAds.length) {
+            return res.status(404).json({ error: "No active ads found" });
+        }
+        return res.status(200).json(activeAds); 
+    } catch (error) {
+        console.error('Error fetching active ads:', error);
+        return res.status(500).json({ error: "Something went wrong while fetching active ads" });
+    }
+};
+
+export const addReviewToAd = async (req, res) => {
+    try {
+        const { adId } = req.params;
+        const { comment } = req.body;
+        const userId = req.user.userId;
+
+        const ad = await Ad.findById(adId);
+        if (!ad) {
+            return res.status(404).json({ error: "Ad not found" });
+        }
+
+        await ad.addReview(userId, comment);
+
+        return res.status(200).json(ad);  
+    } catch (error) {
+        console.error('Error adding review:', error);
+        return res.status(500).json({ error: "Something went wrong while adding review" });
+    }
+};
+
+export const likeAd = async (req, res) => {
+    try {
+        const { adId } = req.params;
+        const userId = req.user.userId;
+
+        const ad = await Ad.findById(adId);
+        if (!ad) {
+            return res.status(404).json({ error: "Ad not found" });
+        }
+
+        await ad.likeAd(userId); // Toggle like on ad
+
+        return res.status(200).json(ad);  // Send the updated ad directly
+    } catch (error) {
+        console.error('Error liking ad:', error);
+        return res.status(500).json({ error: "Something went wrong while liking the ad" });
+    }
+};
+
+export const getAdById = async (req, res) => {
+    try {
+        const { adId } = req.params;
+
+        const ad = await Ad.findById(adId)
+            .populate('seller', 'username') 
+            .populate('likes.user', 'username')  
+            .populate('reviews.user', 'username');  
+
+        if (!ad) {
+            return res.status(404).json({
+                error: "Ad not found"
+            });
+        }
+
+        return res.status(200).json(ad); 
+    } catch (error) {
+        console.error('Error fetching individual ad:', error);
+        return res.status(500).json({
+            error: "Something went wrong while fetching the ad details",
             error
         });
     }

@@ -68,12 +68,17 @@ export const logoutUser = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password'); 
+    const user = await User.findById(req.userId)
+      .select('-password')
+      .populate('ads purchasedAds auctions')
+      .populate('followers', 'username')
+      .populate('following', 'username');
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json({ user });
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }

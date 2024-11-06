@@ -1,4 +1,5 @@
 import Auction from "../models/auction.model.js";
+import User from "../models/user.model.js";
 import { io } from "../socket/socket.js";
 
 export const createAuction = async (req, res) => {
@@ -17,6 +18,11 @@ export const createAuction = async (req, res) => {
     auction.setEndTime(duration); 
 
     await auction.save();
+
+    const user = await User.findById({createdBy});
+    user.auctions.push(auction._id);
+    await user.save();
+    
     res.status(201).json(auction);
   } catch (error) {
     res.status(500).json({ error: error.message });

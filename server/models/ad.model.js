@@ -5,10 +5,6 @@ const adSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
-  },
   imageurl: {
     type: String,
     required: true,
@@ -28,6 +24,11 @@ const adSchema = new mongoose.Schema({
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
+  },
+  soldTo: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
   },
   likes: [
     {
