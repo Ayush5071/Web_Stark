@@ -1,4 +1,5 @@
 import Auction from "../models/auction.model.js";
+import User from "../models/user.model.js";
 import { io } from "../socket/socket.js";
 
 export const createAuction = async (req, res) => {
@@ -17,16 +18,20 @@ export const createAuction = async (req, res) => {
     auction.setEndTime(duration); 
 
     await auction.save();
+
+    const user = await User.findById({createdBy});
+    user.auctions.push(auction._id);
+    await user.save();
+    
     res.status(201).json(auction);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// get all active auctions
 export const getActiveAuctions = async (req, res) => {
   try {
-    const activeAuctions = await Auction.getActiveAuctions(); // encapsulation is done for code check ---> auction model
+    const activeAuctions = await Auction.getActiveAuctions(); // encapsulation is done for code, check ---> auction model okay !!
     res.status(200).json(activeAuctions);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -38,7 +43,7 @@ export const placeBid = async (req, res) => {
     try {
       const { bidAmount } = req.body;
       const {id : auctionId} =  req.params
-      const userId = req.user._id; 
+      const userId = req.user.userId; 
   
       const auction = await Auction.findById(auctionId);
   

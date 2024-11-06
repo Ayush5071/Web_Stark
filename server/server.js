@@ -10,6 +10,7 @@ import messageRoutes from './routes/message.route.js';
 import auctionRoutes from './routes/auction.route.js';
 import userRoutes from "./routes/user.routes.js";
 import StoreRoutes from "./routes/store.routes.js";
+import lostnfoundRoutes from "./routes/lostnfound.routes.js"
 
 import { io, app, server } from './socket/socket.js';
 
@@ -28,10 +29,11 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user',userRoutes);
-app.use('/api/ad', adroutes);
+app.use('/api/ad/', adroutes);
 app.use('/api/message', messageRoutes);
 app.use('/api/auction', auctionRoutes);
 app.use('/api/store/',StoreRoutes);
+app.use('/api/lnf/',lostnfoundRoutes);
 
 const PORT = process.env.PORT || 4000;
 

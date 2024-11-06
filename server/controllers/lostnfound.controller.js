@@ -20,7 +20,7 @@ export const createLostAndFoundItem = async (req, res) => {
 export const claimItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.userid; 
+    const userId = req.user.userId; 
 
     const item = await LostAndFound.findById(id);
     if (!item) return res.status(404).json({ message: 'Item not found' });

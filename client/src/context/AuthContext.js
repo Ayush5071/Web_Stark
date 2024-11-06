@@ -11,6 +11,7 @@ export const AuthContextProvider = ({ children }) => {
 
     useEffect(() => {
         const userFromCookie = fetchAuthFromCookie(); 
+        console.log("cookie se mila ---", userFromCookie);
         const authFromStorage = localStorage.getItem("auth");
         const verifiedFromStorage = localStorage.getItem("verified");
 

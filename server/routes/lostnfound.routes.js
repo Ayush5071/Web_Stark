@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.post('/create', isAuthenticated,createLostAndFoundItem);
 
-router.put('/:id/claim',isAuthenticated, claimItem);
+router.post('/claim/:id',isAuthenticated, claimItem);
 
-router.put('/:id/unclaim',isAuthenticated, unclaimItem);
+router.post('/unclaim/:id',isAuthenticated, unclaimItem);
 
 router.get('/claimed', getClaimedItems);
 
