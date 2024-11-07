@@ -4,14 +4,23 @@ import User from "../models/user.model.js";
 export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    await user.updateProfile(req.body);
-    res.status(200).json({ message: 'Profile updated successfully' });
+    const imageUrl = req.file ? req.file.path : user.profileImg;
+    const updatedData = { ...req.body, profileImg: imageUrl };
+    console.log(updatedData,"link->",imageUrl);
+
+    await user.updateProfile(updatedData);
+    
+    res.status(200).json({ message: "Profile updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update profile' });
+    console.error("Failed to update profile:", error);
+    res.status(500).json({ message: "Failed to update profile" });
   }
 };
+
 
 export const updatePassword = async (req, res) => {
   try {
@@ -31,8 +40,10 @@ export const updatePassword = async (req, res) => {
 
 export const followUser = async (req, res) => {
   try {
+    console.log("suru");
     const user = await User.findById(req.user.userId);
     const followUser = await User.findById(req.params.userId);
+    console.log("aya")
 
     if (!user || !followUser) return res.status(404).json({ message: 'User not found' });
 
@@ -43,7 +54,7 @@ export const followUser = async (req, res) => {
       await followUser.save();
       res.status(200).json({ message: 'Followed user successfully' });
     } else {
-      res.status(400).json({ message: 'Already following this user' });
+      res.status(200).json({ message: 'Already following this user' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Failed to follow user' });
