@@ -1,20 +1,30 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import useAd from "@/hooks/useAd"; // Adjust the path as needed
+import useAd from "@/hooks/useAd";
 import ReviewList from "@/components/Ads/components/ReviewList";
-import ReviewForm from "@/components/Ads/components/ReviewForm"; // Adjust the path as needed
 
 const IndividualAdPage = () => {
-  const { adId } = useParams();  // Fetch the adId from the URL params
+  const { adId } = useParams();
   const { adDetails, getIndividualAd, loading, error } = useAd();
+  const [reviewsUpdated, setReviewsUpdated] = useState(false);
 
   useEffect(() => {
-    // Only call the function if adId is available and adDetails is not already loaded
     if (adId && !adDetails) {
-      getIndividualAd(adId);  // Fetch ad details only when adId is present
+      getIndividualAd(adId);
     }
-  }, [adId, adDetails, getIndividualAd]);  // Add adDetails to dependencies to prevent repeated calls
+  }, [adId, adDetails, getIndividualAd]);
+
+  const handleReviewAdded = () => {
+    setReviewsUpdated(true);
+  };
+
+  useEffect(() => {
+    if (reviewsUpdated) {
+      getIndividualAd(adId);
+      setReviewsUpdated(false);
+    }
+  }, [reviewsUpdated, adId, getIndividualAd]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -32,8 +42,7 @@ const IndividualAdPage = () => {
           <p>{adDetails.description}</p>
           <p>Price: {adDetails.price}</p>
           <img src={adDetails.imageurl} alt={adDetails.title} />
-          <ReviewForm adId={adId} />
-          <ReviewList adId={adId} />
+          <ReviewList adId={adId} onReviewAdded={handleReviewAdded} />
         </div>
       ) : (
         <p>Ad not found</p>

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-// Import your components
+
+
 import Allads from "@/components/Ads/allAds/page";
 import ActiveAds from "@/components/Ads/Activeads/page";
 import CreateAds from "@/components/Ads/createAds/page";

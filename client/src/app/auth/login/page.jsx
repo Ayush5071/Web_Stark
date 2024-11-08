@@ -5,38 +5,38 @@ import { useAuthContext } from '@/context/AuthContext';
 import { loginUser } from '@/lib/authApi/api';
 
 function Login() {
-    const router = useRouter();
-    const { setAuth, setVerified } = useAuthContext();
+    const { setAuth, setIsVerified, auth } = useAuthContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError("");
+        console.log("Login attempt with email:", email);
 
         try {
             const response = await loginUser({ email, password });
-            console.log(response, "The response at login page");
+            console.log("Login response:", response);
 
             if (response) {
-                setAuth(response);
-                setVerified(response);
-
+                setAuth(response); 
+                setIsVerified(response.isVerified); 
                 if (response.isVerified) {
-                    router.push("/");
+                    router.push("/"); 
                 } else {
-                    router.push("/auth/otp");
+                    router.push("/auth/otp"); 
                 }
             } else {
-                setError(response.message);
-                console.log("Login error:");
+                setError(response.message || "An unknown error occurred.");
+                console.log("Login error:", response.message);
             }
         } catch (err) {
             setError("An error occurred while logging in.");
+            console.error("Login error:", err);
         }
     };
-
     return (
         <div className="flex items-center justify-center min-h-screen bg-cover bg-center relative"
              style={{

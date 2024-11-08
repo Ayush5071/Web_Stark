@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import Cookies from "js-cookie";  // To manage cookies
 
 const UserContext = createContext();
 
@@ -9,16 +9,46 @@ export const useUserContext = () => {
 };
 
 export const UserProvider = ({ children }) => {
+  const [auth, setAuth] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // Get user data directly from the token in the cookie
+  const getAuthFromCookie = () => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT token
+        console.log("Decoded token:", decodedToken);
+        setAuth(decodedToken.user);  // Assuming your token contains user data
+      } catch (err) {
+        console.error("Error decoding token", err);
+      }
+    } else {
+      console.log("No token found in cookies.");
+    }
+  };
+
   // Fetch Profile
   const getProfile = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_URL}/auth/profile`, { withCredentials: true });
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Make sure to include cookies in the request
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const data = await response.json();
+      console.log("Profile fetched successfully:", data);
       setProfile(data);
     } catch (err) {
       console.error("Error fetching profile", err);
@@ -27,7 +57,7 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // Update Profile (use this for local profile update after follow/unfollow)
+  // Update Profile
   const updateProfile = (updatedProfile) => {
     setProfile(updatedProfile);
   };
@@ -35,9 +65,17 @@ export const UserProvider = ({ children }) => {
   // Follow User
   const followUser = async (userId) => {
     try {
-      const { data } = await axios.put(`${API_URL}/user/follow/${userId}`, {}, { withCredentials: true });
-      console.log(data, "on following");
-      await getProfile(); // Fetch updated profile after follow action
+      const response = await fetch(`${API_URL}/user/follow/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      console.log("Followed user:", data);
+      await getProfile();
       return data;
     } catch (err) {
       console.error("Error following user", err);
@@ -47,33 +85,52 @@ export const UserProvider = ({ children }) => {
   // Unfollow User
   const unfollowUser = async (userId) => {
     try {
-      const { data } = await axios.put(`${API_URL}/user/unfollow/${userId}`, {}, { withCredentials: true });
-      await getProfile(); // Fetch updated profile after unfollow action
+      const response = await fetch(`${API_URL}/user/unfollow/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      await getProfile();
       return data;
     } catch (err) {
       console.error("Error unfollowing user", err);
     }
   };
 
+  // Update Password
   const updatePassword = async (passwordData) => {
     try {
-      const { data } = await axios.put(`${API_URL}/user/password`, passwordData, { withCredentials: true });
+      const response = await fetch(`${API_URL}/user/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include credentials (cookies)
+        body: JSON.stringify(passwordData),
+      });
+
+      const data = await response.json();
       console.log("Password updated successfully", data);
       return data;
     } catch (err) {
       console.error("Error updating password", err);
-      throw err; 
+      throw err;
     }
   };
 
   useEffect(() => {
-    if (!profile) {
+    getAuthFromCookie();
+    if (auth && !profile) {
       getProfile();
     }
-  }, [profile]);
+  }, [auth, profile]);
 
   return (
-    <UserContext.Provider value={{ profile, setProfile: updateProfile, followUser, unfollowUser, loading, getProfile, updatePassword }}>
+    <UserContext.Provider value={{ auth, setAuth, profile, setProfile: updateProfile, followUser, unfollowUser, loading, getProfile, updatePassword }}>
       {children}
     </UserContext.Provider>
   );

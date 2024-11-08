@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import useAd from "@/hooks/useAd"; // Adjust the path as needed
+import useAd from "@/hooks/useAd";
 
-const ReviewForm = ({ adId }) => {
+const ReviewForm = ({ adId, onReviewAdded }) => {
   const { addReview } = useAd();
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +22,9 @@ const ReviewForm = ({ adId }) => {
     try {
       await addReview(adId, comment);
       console.log("Review successfully added!");
-      setComment(""); // Clear the textarea after submission
+      setComment(""); 
+
+      if (onReviewAdded) onReviewAdded(); 
     } catch (error) {
       console.error("Error adding review:", error);
     } finally {

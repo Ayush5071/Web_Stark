@@ -22,7 +22,9 @@ export const getAd = async (req, res) => {
 export const postAd = async (req, res) => {
     try {
         const { title, description, price, location, productType } = req.body;
+        console.log("title -",title);
         const imageurl = req.file.path;
+        console.log(imageurl,"img to  agyi");
         const seller = req.user.userId;
 
         console.log("img url", imageurl);
@@ -69,7 +71,7 @@ export const getMyAd = async (req, res) => {
             .populate('reviews.user', 'username'); 
 
         if (!myAds.length) {
-            return res.status(404).json({
+            return res.status(200).json({
                 message: "No ads found for this user"
             });
         }

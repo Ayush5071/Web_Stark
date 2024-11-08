@@ -1,21 +1,19 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
-import { fetchAuthFromCookie } from "@/lib/authApi/api";
 
 function HomePage() {
   const router = useRouter();
-  const { auth, verified } = useAuthContext();
-  const cookieData = fetchAuthFromCookie();
-  console.log(cookieData);
+  const { auth, isVerified } = useAuthContext();
 
-  console.log("Auth HOme",auth);
+  console.log("Auth Home:", auth);
+  console.log("Is Verified Home:", isVerified);
 
   const handleLoginClick = () => {
     router.push("/auth/login");
   };
 
-  if (!auth || !verified) {
+  if (!auth || !isVerified) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <button
