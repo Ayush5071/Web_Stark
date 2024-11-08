@@ -24,12 +24,15 @@ const ActiveAds = () => {
   };
 
   if (loading) return <div className="text-center text-white">Loading...</div>;
-  if (error) return <div className="text-center text-white">Error: {error}</div>;
+  if (error)
+    return <div className="text-center text-white">Error: {error}</div>;
 
   return (
     <div className="flex items-center justify-center h-full">
-      <div className="w-full max-w-7xl bg-gray-900 p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-white mb-6 text-center">Active Ads</h1>
+      <div className="w-full max-w-7xl bg-gradient-to-b from-[#0A2472] to-[#0E6BA8] p-8 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-white mb-6 text-center">
+          Active Ads
+        </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {activeAds.length > 0 ? (
             activeAds.map((ad) => (

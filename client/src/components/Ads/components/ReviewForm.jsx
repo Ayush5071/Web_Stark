@@ -34,15 +34,19 @@ const ReviewForm = ({ adId, onReviewAdded }) => {
 
   return (
     <div className="review-form">
-      <h3>Leave a Review</h3>
+      <h3 className="text-2xl mb-4">Leave a Review</h3>
       <form onSubmit={handleSubmit}>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Write your review..."
           required
+          className="border border-gray-400 rounded-lg w-full h-24 mb-3"
         />
-        <button type="submit" disabled={isSubmitting}>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="border border-black rounded-lg px-3 py-1"
+        >
           {isSubmitting ? "Submitting..." : "Submit Review"}
         </button>
       </form>
