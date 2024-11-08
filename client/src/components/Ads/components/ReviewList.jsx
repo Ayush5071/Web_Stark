@@ -30,8 +30,8 @@ const ReviewList = ({ adId }) => {
 
   return (
     <div className="reviews-section">
-      <h2>Reviews</h2>
-      <ReviewForm adId={adId} onReviewAdded={handleReviewAdded} />
+      <h2 className="text-2xl mb-3">Reviews</h2>
+      {/* <ReviewForm adId={adId} onReviewAdded={handleReviewAdded} /> */}
       {reviews.length > 0 ? (
         <ul className="review-list">
           {reviews.map((review, index) => (
