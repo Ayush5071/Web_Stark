@@ -1,4 +1,4 @@
-"use client"
+// useListenMessage.js
 import { useEffect } from "react";
 import notificationSound from "../assets/sounds/notification.mp3";
 import useConversation from "@/store/useConversation";
@@ -6,7 +6,7 @@ import { useSocketContext } from "@/context/SocketContext";
 
 const useListenMessage = () => {
     const { socket } = useSocketContext();
-    const { messages, setMessages } = useConversation();
+    const { setMessages } = useConversation();
 
     useEffect(() => {
         if (!socket) return;
@@ -15,9 +15,10 @@ const useListenMessage = () => {
             newMessage.shouldShake = true;
             const sound = new Audio(notificationSound);
             sound.play();
-            setMessages((prevMessages) => [...prevMessages, newMessage]); 
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
         };
 
+        // Listen for real-time new message events
         socket.on("newMessage", handleNewMessage);
 
         return () => {

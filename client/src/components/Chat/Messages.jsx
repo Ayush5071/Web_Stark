@@ -7,8 +7,10 @@ import useListenMessage from "@/hooks/useListenMessages";
 import useGetMessages from "@/hooks/useGetMessages";
 
 const Messages = () => {
-    const { messages = [], loading } = useGetMessages();  // Ensure messages is always an array
+    const { messages, loading } = useGetMessages();  // Default to empty array
     const lastMessageRef = useRef();
+
+    console.log("messages in messages ",messages);
 
     useListenMessage();
 
