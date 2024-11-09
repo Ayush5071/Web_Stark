@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+const API_URL = 'http://localhost:4000/api';
 
 const LnfContext = createContext();
 
@@ -10,40 +10,59 @@ export const LnfProvider = ({ children }) => {
   const [myUploadedItems, setMyUploadedItems] = useState([]);
 
   const fetchClaimedItems = async () => {
-    const response = await axios.get('/api/lnf/claimed');
-    setClaimedItems(response.data.items);
+    const response = await fetch(`${API_URL}/lnf/claimed`);
+    const data = await response.json();
+    setClaimedItems(data.items);
   };
 
   const fetchUnclaimedItems = async () => {
-    const response = await axios.get('/api/lnf/unclaimed');
-    setUnclaimedItems(response.data.items);
+    const response = await fetch(`${API_URL}/lnf/unclaimed`);
+    const data = await response.json();
+    setUnclaimedItems(data.items);
   };
 
   const fetchMyClaimedItems = async () => {
-    const response = await axios.get('/api/lnf/my-claimed', { withCredentials: true });
-    setMyClaimedItems(response.data.items);
+    const response = await fetch(`${API_URL}/lnf/my-claimed`, { credentials: 'include' });
+    const data = await response.json();
+    setMyClaimedItems(data.items);
   };
 
   const fetchMyUploadedItems = async () => {
-    const response = await axios.get('/api/lnf/my-uploaded', { withCredentials: true });
-    setMyUploadedItems(response.data.items);
+    const response = await fetch(`${API_URL}/lnf/my-uploaded`, { credentials: 'include' });
+    const data = await response.json();
+    setMyUploadedItems(data.items);
   };
 
   const createLostAndFoundItem = async (form) => {
-    const response = await axios.post('/api/lnf/create', form, { withCredentials: true });
+    console.log("found "+form);
+    const response = await fetch(`${API_URL}/lnf/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(form),
+    });
+    const data = await response.json();
     fetchUnclaimedItems();
-    return response.data;
+    return data;
   };
 
   const claimItem = async (id) => {
-    await axios.post(`/api/lnf/claim/${id}`, {}, { withCredentials: true });
+    await fetch(`${API_URL}/lnf/claim/${id}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
     fetchUnclaimedItems();
     fetchClaimedItems();
     fetchMyClaimedItems();
   };
 
   const unclaimItem = async (id) => {
-    await axios.post(`/api/lnf/unclaim/${id}`, {}, { withCredentials: true });
+    await fetch(`${API_URL}/lnf/unclaim/${id}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
     fetchClaimedItems();
     fetchMyClaimedItems();
   };
