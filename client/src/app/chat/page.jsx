@@ -1,15 +1,13 @@
-"use client"
+"use client";
 
-import MessageContainer from "@/components/Chat/MessageContainer"
-import Sidebar from "@/components/Chat/Sidebar"
+import ChatComponent from "@/components/Chat/ChatComponent";
 
-const Home = () => {
+const page = () => {
   return (
-    <div className="flex sm:h-[450px] md:h-[590px] h-[350px] rounded-lg overflow-hidden bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0">
-        <Sidebar />
-        <MessageContainer/>         
+    <div className="h-screen w-screen bg-[url('/auth/back1.jpg')] flex justify-center items-center">
+      <ChatComponent />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default page;

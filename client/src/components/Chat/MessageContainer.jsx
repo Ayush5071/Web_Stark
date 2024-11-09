@@ -18,7 +18,7 @@ const MessageContainer = () => {
         <div className="md:min-w-[700px] flex flex-col">
             {!selectedConversation ? <NoChatSelected /> : (
                 <>
-                    <div className="bg-slate-500 px-4 py-2 mb-2">
+                    <div className="bg-zinc-600 px-4 py-2 mb-2">
                         <span className="label-text text-base">To: </span>
                         <span className="text-gray-900 mx-1 text-lg font-bold">
                             {selectedConversation?.username}
