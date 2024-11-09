@@ -4,6 +4,7 @@ import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 import { SocketContextProvider } from "@/context/SocketContext";
 import { StoreContextProvider } from "@/context/storeContext";
+import { LnfProvider } from '@/context/LnfContext';
 import { useEffect } from "react";
 export default function RootLayout({ children }) {
   useEffect(() => {
@@ -26,8 +27,10 @@ export default function RootLayout({ children }) {
         <AuthContextProvider>
           <UserProvider>
             <SocketContextProvider>
-              <StoreContextProvider>   
+              <StoreContextProvider>  
+                <LnfProvider>
                 {children}
+                </LnfProvider>
               </StoreContextProvider>
             </SocketContextProvider>
           </UserProvider>
