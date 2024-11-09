@@ -48,6 +48,8 @@ export const StoreContextProvider = ({ children }) => {
         body: JSON.stringify({ organizationName }),
         credentials: 'include',
       });
+
+      console.log(response,"reshai ye");
       if (!response.ok) throw new Error("Error creating store");
 
       const data = await response.json();
@@ -58,22 +60,23 @@ export const StoreContextProvider = ({ children }) => {
     }
   };
 
-  const addAdToStore = async (adId) => {
+  const addAdToStore = async (adId, organizationName) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/add-ad`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/add-ad/${organizationName}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adId }),
         credentials: 'include',
       });
       if (!response.ok) throw new Error("Error adding ad to store");
-
+  
       const data = await response.json();
-      setMyStore(data);
+      setMyStore(data); // Update the myStore state with the updated store
     } catch (error) {
       toast.error(error.message);
     }
   };
+  
 
   const removeAdFromStore = async (adId) => {
     try {

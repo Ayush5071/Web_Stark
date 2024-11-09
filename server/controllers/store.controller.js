@@ -2,13 +2,16 @@ import Ad from "../models/ad.model.js";
 import OnlineStore from "../models/onlineStore.model.js";
 
 export const createStore = async (req, res) => {
+  console.log(req.body);
   const { organizationName } = req.body;
+  console.log("org name  - ", organizationName);
   try {
     const newStore = new OnlineStore({
       user: req.user.userId,
       organizationName,
     });
     const savedStore = await newStore.save();
+    console.log(savedStore);
     res.status(201).json({ message: 'Store created successfully', store: savedStore });
   } catch (error) {
     res.status(500).json({ message: 'Error creating store', error });
@@ -36,8 +39,13 @@ export const getAllStores = async (req, res) => {
 
 export const addAdToStore = async (req, res) => {
   const { adId } = req.body;
+  const { organizationName } = req.params;
+
   try {
-    const store = await OnlineStore.findOne({ user: req.user.userId });
+    const store = await OnlineStore.findOne({ 
+      user: req.user.userId, 
+      organizationName 
+    });
     if (!store) return res.status(404).json({ error: 'Store not found' });
 
     const ad = await Ad.findById(adId);
@@ -54,6 +62,7 @@ export const addAdToStore = async (req, res) => {
     res.status(500).json({ error: 'Error adding ad to store' });
   }
 };
+
 
 export const removeAdFromStore = async (req, res) => {
   const { adId } = req.params;
