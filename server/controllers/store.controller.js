@@ -46,7 +46,7 @@ export const addAdToStore = async (req, res) => {
     if (!store.ads.includes(adId)) {
       store.ads.push(adId);
       await store.save();
-      return res.json({ message: 'Ad added to store', store });
+      return res.json(store);
     } else {
       return res.status(400).json({ error: 'Ad already in store' });
     }
@@ -63,7 +63,7 @@ export const removeAdFromStore = async (req, res) => {
 
     store.ads = store.ads.filter((ad) => ad.toString() !== adId);
     await store.save();
-    res.json({ message: 'Ad removed from store', store });
+    res.json(store);
   } catch (error) {
     res.status(500).json({ error: 'Error removing ad from store' });
   }
