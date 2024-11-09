@@ -1,10 +1,9 @@
-"use client"
+"use client";
+
 import { createContext, useContext, useState, useEffect } from "react";
 
-// Creating AuthContext to manage authentication state
 export const AuthContext = createContext();
 
-// Custom hook to access the AuthContext
 export const useAuthContext = () => {
     return useContext(AuthContext);
 };
@@ -13,15 +12,26 @@ export const AuthContextProvider = ({ children }) => {
     const [auth, setAuth] = useState(null); 
     const [isVerified, setIsVerified] = useState(false); 
 
-    useEffect(() => {
+    const initializeAuth = async () => {
         const storedAuth = localStorage.getItem("auth");
         if (storedAuth) {
             const parsedAuth = JSON.parse(storedAuth);
             setAuth(parsedAuth);
             setIsVerified(parsedAuth?.isVerified || false);
+        } else {
+            try {
+                const profileData = await getProfile();
+                setAuth(profileData);
+                setIsVerified(profileData.isVerified);
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+            }
         }
-    }, []);
+    };
 
+    useEffect(() => {
+        initializeAuth();
+    }, []);
 
     const getTokenFromCookies = () => {
         if (typeof document !== "undefined") {
@@ -71,10 +81,10 @@ export const AuthContextProvider = ({ children }) => {
         }
 
         const data = await response.json();
+        setAuthDetails(data);
         return data;
     };
 
-    // OTP verification function
     const verifyOTP = async ({ otp, userId }) => {
         if (!userId) {
             throw new Error('User ID not found.');
@@ -96,6 +106,7 @@ export const AuthContextProvider = ({ children }) => {
         }
 
         const data = await response.json();
+        setAuthDetails(data);
         return data;
     };
 
@@ -109,13 +120,11 @@ export const AuthContextProvider = ({ children }) => {
             throw new Error('Logout failed');
         }
 
-        // Clear auth and verification state after successful logout
         setAuth(null);
         setIsVerified(false);
-        localStorage.removeItem("auth"); // Remove auth data from localStorage
+        localStorage.removeItem("auth");
     };
 
-    // Fetch user profile data (protected route)
     const getProfile = async () => {
         const token = getTokenFromCookies();
 
@@ -136,10 +145,10 @@ export const AuthContextProvider = ({ children }) => {
         }
 
         const data = await response.json();
+        setAuthDetails(data); 
         return data;
     };
 
-    // Function to set auth details and update state
     const setAuthDetails = (userData) => {
         setAuth(userData);
         setIsVerified(userData.isVerified);

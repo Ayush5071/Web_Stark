@@ -18,9 +18,11 @@ const useGetConversations = () => {
                     credentials: 'include'  
                 });
                 const data = await res.json();
+                console.log("acive users - ", data);
                 if (data.error) {
                     throw new Error(data.error);
                 }
+                
                 setConversations(data);
             } catch (error) {
                 toast.error(error.message);

@@ -1,14 +1,15 @@
 "use client"
 
 import { useSocketContext } from "@/context/SocketContext";
-import useGetConversations from "@/hooks/useGetConversation";
+import useConversation from "@/store/useConversation";
 
 
 const Conversation = ({conversation,lastidx}) => {
-  const {selectedConversation,setSelectedConversation} = useGetConversations();
+  const {selectedConversation,setSelectedConversation} = useConversation();
   const {onlineUsers} = useSocketContext();
 
   const isOnline = onlineUsers.includes(conversation._id);
+
   console.log("check online",isOnline);
 
   const isSelected = (selectedConversation) ? selectedConversation._id === conversation._id : null;

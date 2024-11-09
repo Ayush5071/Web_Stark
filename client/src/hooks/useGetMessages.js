@@ -15,14 +15,17 @@ const useGetMessages = () => {
             }
             setLoading(true);
             try {
-                const res = await fetch(`http://localhost:4000/api/message/${selectedConversation?._id}`, {
+                console.log("yha pr aya _>")
+                const res = await fetch(`http://localhost:4000/api/message/get/${selectedConversation?._id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     credentials: "include"
                 });
+                console.log("lllllllllloooooooooolllllllllll")
                 const data = await res.json();
+                console.log("usegetMEssags",data);
                 if (data.error) throw new Error(data.error);
                 setMessages(data);
             } catch (error) {

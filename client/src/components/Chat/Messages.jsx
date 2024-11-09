@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useRef } from "react";
 import Message from "./Message";
@@ -7,7 +7,7 @@ import useListenMessage from "@/hooks/useListenMessages";
 import useGetMessages from "@/hooks/useGetMessages";
 
 const Messages = () => {
-    const { messages, loading } = useGetMessages();
+    const { messages = [], loading } = useGetMessages();  // Ensure messages is always an array
     const lastMessageRef = useRef();
 
     useListenMessage();
