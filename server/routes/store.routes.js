@@ -11,7 +11,7 @@ router.get('/mystore', isAuthenticated, getMyStore);
 
 router.get('/allstores', getAllStores);
 
-router.post('/add-ad', isAuthenticated, addAdToStore);
+router.post('/add-ad/:organizationName', isAuthenticated, addAdToStore);
 
 router.delete('/remove-ad/:adId', isAuthenticated, removeAdFromStore);
 
