@@ -21,10 +21,10 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-lg bg-white shadow-md rounded-lg p-8">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-lg bg-white shadow-md rounded-lg p-7">
         <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">Create Lost Item</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-9">
           <div>
             <label className="block text-gray-600 font-medium mb-1">Item Name</label>
             <input
@@ -45,7 +45,6 @@ export default function CreatePage() {
               onChange={handleChange}
               required
               className="w-full bg-white px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="4"
             />
           </div>
           <div>
