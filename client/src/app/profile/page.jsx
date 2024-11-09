@@ -12,11 +12,10 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
-    // Fetch profile when the component mounts
     if (!profile) {
       getProfile();
     }
-  }, [profile, getProfile]); // Only fetch profile if it's not available
+  }, [profile, getProfile]); 
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;

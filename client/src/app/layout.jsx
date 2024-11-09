@@ -2,6 +2,7 @@ import { AuthContextProvider } from "@/context/AuthContext";
 import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 import { SocketContextProvider } from "@/context/SocketContext";
+import { StoreContextProvider } from "@/context/storeContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
         <AuthContextProvider>
           <UserProvider>
             <SocketContextProvider>
-          {children}
+              <StoreContextProvider>   
+                {children}
+              </StoreContextProvider>
             </SocketContextProvider>
           </UserProvider>
         </AuthContextProvider>
