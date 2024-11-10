@@ -15,7 +15,7 @@ const Dashboard = () => {
     if (!profile) {
       getProfile();
     }
-  }, [profile, getProfile]); 
+  }, [profile, getProfile]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -27,30 +27,30 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-[20vw] bg-gray-800 text-white p-4">
+      <div className="w-[20vw] bg-gradient-to-b from-[#0A2472] to-[#0E6BA8] text-white p-4">
         <div className="flex flex-col items-start">
           <h2 className="text-2xl font-bold text-center mb-6">Dashboard</h2>
           <button
             onClick={() => handleTabChange("profile")}
-            className="flex items-center w-full py-2 px-4 hover:bg-gray-700 rounded-md mb-4"
+            className="flex items-center w-full py-2 px-4 hover:bg-white hover:text-blue-800 rounded-md mb-4"
           >
             <FaUserCircle className="mr-2" /> Profile
           </button>
           <button
             onClick={() => handleTabChange("followers")}
-            className="flex items-center w-full py-2 px-4 hover:bg-gray-700 rounded-md mb-4"
+            className="flex items-center w-full py-2 px-4 hover:bg-white hover:text-blue-800 rounded-md mb-4"
           >
             <FaUsers className="mr-2" /> Followers
           </button>
           <button
             onClick={() => handleTabChange("following")}
-            className="flex items-center w-full py-2 px-4 hover:bg-gray-700 rounded-md mb-4"
+            className="flex items-center w-full py-2 px-4 hover:bg-white hover:text-blue-800 rounded-md mb-4"
           >
             <FaUsers className="mr-2" /> Following
           </button>
           <button
             onClick={() => handleTabChange("settings")}
-            className="flex items-center w-full py-2 px-4 hover:bg-gray-700 rounded-md"
+            className="flex items-center w-full py-2 px-4 hover:bg-white hover:text-blue-800 rounded-md"
           >
             <FaCog className="mr-2" /> Settings
           </button>
@@ -60,7 +60,7 @@ const Dashboard = () => {
       {/* Main content */}
       <div className="flex flex-col w-full">
         {/* Navbar */}
-        <div className="bg-gray-900 text-white p-4 shadow-md">
+        <div className="bg-[#011246] text-white p-4 shadow-md">
           <h1 className="text-xl font-bold">Welcome to your Dashboard</h1>
         </div>
 
