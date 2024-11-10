@@ -13,8 +13,8 @@ router.get('/allstores', getAllStores);
 
 router.post('/add-ad/:organizationName', isAuthenticated, addAdToStore);
 
-router.delete('/remove-ad/:adId', isAuthenticated, removeAdFromStore);
+router.delete('/remove-ad/:organizationName', isAuthenticated, removeAdFromStore);
 
-router.delete('/delete-store', isAuthenticated, deleteStore);
+router.delete('/delete-store/:storeId', isAuthenticated, deleteStore);
 
 export default router;

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useStoreContext } from "@/context/storeContext";
 import AllStores from "@/components/store/Allstores";
 import CreateStore from "@/components/store/CreateStore";
+import MyStores from "@/components/store/MyStores";
 
 const StoreDashboard = () => {
   const { fetchStores, fetchMyStore, createStore } = useStoreContext();
@@ -14,7 +15,7 @@ const StoreDashboard = () => {
   const components = {
     Welcome: <p>Welcome to your store dashboard!</p>,
     AllStores: <AllStores />, // Render the AllStores component here
-    MyStore: <p>Your store and ads will be displayed here.</p>,
+    MyStore: <MyStores/>,
     CreateStore: <CreateStore/>,
   };
 
