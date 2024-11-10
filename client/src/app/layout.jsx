@@ -4,6 +4,7 @@ import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 import { SocketContextProvider } from "@/context/SocketContext";
 import { StoreContextProvider } from "@/context/storeContext";
+import { LnfProvider } from '@/context/LnfContext';
 import { AuctionProvider } from "@/context/AuctionContext";
 import { useEffect } from "react";
 
@@ -28,10 +29,12 @@ export default function RootLayout({ children }) {
         <AuthContextProvider>
           <UserProvider>
             <SocketContextProvider>
-              <StoreContextProvider> 
+              <StoreContextProvider>  
+                <LnfProvider>
                 <AuctionProvider>  
                   {children}
                 </AuctionProvider>
+               </LnfProvider>
               </StoreContextProvider>
             </SocketContextProvider>
           </UserProvider>
