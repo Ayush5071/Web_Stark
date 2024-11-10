@@ -1,18 +1,18 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors'; // Import cors
 import dotenv from 'dotenv';
 import express from 'express';
-import cors from 'cors'; // Import cors
 import { connectDb } from './db/connectDb.js';
 
 import adroutes from './routes/ad.routes.js';
-import authRoutes from './routes/auth.route.js';
-import messageRoutes from './routes/message.route.js';
 import auctionRoutes from './routes/auction.route.js';
-import userRoutes from "./routes/user.routes.js";
+import authRoutes from './routes/auth.route.js';
+import interactionroutes from './routes/interaction.routes.js';
+import lostnfoundRoutes from "./routes/lostnfound.routes.js";
+import messageRoutes from './routes/message.route.js';
 import StoreRoutes from "./routes/store.routes.js";
-import lostnfoundRoutes from "./routes/lostnfound.routes.js"
-
-import { io, app, server } from './socket/socket.js';
+import userRoutes from "./routes/user.routes.js";
+import { app, server } from './socket/socket.js';
 
 dotenv.config();
 await connectDb();
@@ -34,7 +34,7 @@ app.use('/api/message', messageRoutes);
 app.use('/api/auction', auctionRoutes);
 app.use('/api/store/',StoreRoutes);
 app.use('/api/lnf/',lostnfoundRoutes);
-
+app.use('/api/interaction',interactionroutes)
 const PORT = process.env.PORT || 4000;
 
 server.listen(PORT, () => {

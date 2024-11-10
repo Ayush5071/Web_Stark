@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from .model.recommendation import get_similar_users,get_user_data,create_user_item_matrix,train_knn_model
-
+from model.recommendation import get_similar_users,get_user_data,create_user_item_matrix,train_knn_model
+import pandas as pd
 app = Flask(__name__)
 
 @app.route('/recommendation/<user_id>', methods=['GET'])
