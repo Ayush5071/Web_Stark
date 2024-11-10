@@ -86,11 +86,66 @@ export const getMyAd = async (req, res) => {
     }
 };
 
+export const adBuy = async(req, res)=>{
+    try {
+        const {adId} = req.params;
+        const {title, price, productType } = req.body;
+
+        const ad = await Ad.findById(adId);
+
+        if(!ad){
+            return res.status(404).json({
+                error: "ad not found"
+            });
+        }
+
+        const options = {
+            amount: price * 100, // Razorpay specific h -> (1 INR = 100 paise)
+            currency: "INR",
+            receipt: `receipt_order_${ad._id}`,
+        };
+
+        try {
+            const order = await razorpayInstance.orders.create(options);
+            console.log("order response ->",order);
+            return res.status(200).json(order);
+          } catch (error) {
+            return res.status(500).json({
+              success: false,
+              message: "Order creation failed",
+              error: error.message,
+            });
+        }
+        
+    } catch (error) {
+        console.log("error in start of Buy",error);
+        res.status(500).json({error:"semthing wrong in start of payment",error});        
+    }
+}
+
+// sahi karna hai abhi
+
 export const markAsSold = async (req, res) => {
     try {
         const { adId } = req.params;
+        const { order_id, payment_id, signature } = req.body;
         const buyerId = req.user.userId;
+        const secret = process.env.RAZORPAY_KEY_SECRET;
 
+        const hmac = crypto.createHmac("sha256", secret);
+        hmac.update(order_id + "|" + payment_id);
+        const generatedSignature = hmac.digest("hex");
+      
+        if (!(generatedSignature === signature)) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification failed",
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment verified",
+          });
         const ad = await Ad.findById(adId);
 
         if (!ad) {
