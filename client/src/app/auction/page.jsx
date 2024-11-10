@@ -1,4 +1,7 @@
 "use client";
+import ActiveAuctions from "@/components/auction/ActiveAuctions";
+import CreateAuction from "@/components/auction/CreateAuction";
+import MyAuction from "@/components/auction/MyAuctions";
 import React, { useState } from "react";
 import { FaGavel, FaList, FaClipboardList, FaCog } from "react-icons/fa";
 
@@ -50,10 +53,9 @@ const AuctionDashboard = () => {
 
         {/* Content Area */}
         <div className="flex-1 p-6 bg-gray-100 overflow-auto">
-          {activeTab === "createAuction" && <div>Create Auction</div>}
-          {activeTab === "activeAuctions" && <div>Active Auctions</div>}
-          {activeTab === "myAuction" && <div>My Auction</div>}
-          {activeTab === "settings" && <div>Settings</div>}
+          {activeTab === "createAuction" && <CreateAuction/>}
+          {activeTab === "activeAuctions" && <ActiveAuctions/>}
+          {activeTab === "myAuction" && <MyAuction/>}
         </div>
       </div>
     </div>
