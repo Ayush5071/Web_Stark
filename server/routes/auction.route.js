@@ -1,6 +1,6 @@
 import express from "express";
 import { isAuthenticated } from "../middlewares/isAuth.js";
-import { createAuction, getActiveAuctions, placeBid } from "../controllers/auction.controller.js";
+import { createAuction, getActiveAuctions, getMyAuction, placeBid } from "../controllers/auction.controller.js";
 const router = express.Router();
 
 router.post('/create',isAuthenticated,createAuction);
@@ -8,6 +8,8 @@ router.post('/create',isAuthenticated,createAuction);
 router.get('/active',isAuthenticated,getActiveAuctions);
 
 router.post('/bid/:id',isAuthenticated,placeBid);
+
+router.get('/myAuction',isAuthenticated, getMyAuction);
 
 
 export default router;
