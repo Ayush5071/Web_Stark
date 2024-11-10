@@ -40,6 +40,7 @@ export const StoreContextProvider = ({ children }) => {
     }
   };
 
+  // Create a new store
   const createStore = async (organizationName) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/create`, {
@@ -48,51 +49,56 @@ export const StoreContextProvider = ({ children }) => {
         body: JSON.stringify({ organizationName }),
         credentials: 'include',
       });
+
       if (!response.ok) throw new Error("Error creating store");
 
       const data = await response.json();
       toast.success(data.message);
-      fetchMyStore(); // Refresh my store data
+      fetchMyStore();
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const addAdToStore = async (adId) => {
+  const addAdToStore = async (adId, organizationName) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/add-ad`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/add-ad/${organizationName}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adId }),
         credentials: 'include',
       });
       if (!response.ok) throw new Error("Error adding ad to store");
-
+  
       const data = await response.json();
-      setMyStore(data);
+      setMyStore(data); 
+      toast.success("Ad added to store!");
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const removeAdFromStore = async (adId) => {
+  const removeAdFromStore = async (adId, organizationName) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/remove-ad/${adId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/remove-ad/${organizationName}`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adId }),
         credentials: 'include',
       });
       if (!response.ok) throw new Error("Error removing ad from store");
 
       const data = await response.json();
       setMyStore(data);
+      toast.success("Ad removed from store!");
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const deleteStore = async () => {
+  const deleteStore = async (storeId) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/delete-store`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/delete-store/${storeId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

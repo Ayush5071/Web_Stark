@@ -11,7 +11,7 @@ const ReviewSection = ({ adId, reviews, onReviewAdded }) => {
 
     if (reviewText.trim()) {
       const newReview = {
-        user: "Current User", // Use real user data if available
+        user: "Current User", 
         comment: reviewText,
       };
 

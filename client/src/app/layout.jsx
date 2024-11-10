@@ -5,7 +5,9 @@ import { UserProvider } from "@/context/UserContext";
 import { SocketContextProvider } from "@/context/SocketContext";
 import { StoreContextProvider } from "@/context/storeContext";
 import { LnfProvider } from '@/context/LnfContext';
+import { AuctionProvider } from "@/context/AuctionContext";
 import { useEffect } from "react";
+
 export default function RootLayout({ children }) {
   useEffect(() => {
     const script = document.createElement("script");
@@ -29,8 +31,10 @@ export default function RootLayout({ children }) {
             <SocketContextProvider>
               <StoreContextProvider>  
                 <LnfProvider>
-                {children}
-                </LnfProvider>
+                <AuctionProvider>  
+                  {children}
+                </AuctionProvider>
+               </LnfProvider>
               </StoreContextProvider>
             </SocketContextProvider>
           </UserProvider>

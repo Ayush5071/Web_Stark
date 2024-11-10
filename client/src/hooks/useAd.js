@@ -12,6 +12,7 @@ const useAd = () => {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // Fetch all ads
   const fetchAds = async () => {
     setLoading(true);
     try {
@@ -28,6 +29,7 @@ const useAd = () => {
     }
   };
 
+  // Fetch details of a specific ad
   const getIndividualAd = async (adId) => {
     setLoading(true);
     try {
@@ -35,6 +37,7 @@ const useAd = () => {
       if (!response.ok) throw new Error("Error fetching ad details");
 
       const data = await response.json();
+      console.log(data,"-> fatch krte time mila");
       setAdDetails(data);
       return data;
     } catch (err) {
@@ -44,6 +47,7 @@ const useAd = () => {
     }
   };
 
+  // Fetch user's ads
   const fetchMyAds = async () => {
     setLoading(true);
     try {
@@ -60,6 +64,7 @@ const useAd = () => {
     }
   };
 
+  // Fetch purchased ads
   const fetchPurchasedAds = async () => {
     setLoading(true);
     try {
@@ -76,6 +81,7 @@ const useAd = () => {
     }
   };
 
+  // Fetch active ads
   const fetchActiveAds = async () => {
     setLoading(true);
     try {
@@ -92,25 +98,50 @@ const useAd = () => {
     }
   };
 
-  const markAdAsSold = async (adId) => {
+  const buyAd = async (adId, price) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/ad/sold/${adId}`, {
+      const response = await fetch(`${API_URL}/ad/adbuy/${adId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price }),
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Error marking ad as sold");
+      if (!response.ok) throw new Error("Error initiating purchase");
 
       const data = await response.json();
       return data;
     } catch (err) {
-      setError(err.message || "Error marking ad as sold");
+      setError(err.message || "Error initiating purchase");
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
+  const verifyAndMarkAsSold = async (adId, orderId, paymentId, signature) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/ad/sold/${adId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId, payment_id: paymentId, signature }),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Error verifying and marking ad as sold");
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      setError(err.message || "Error verifying and marking ad as sold");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Delete an ad
   const deleteAd = async (adId) => {
     setLoading(true);
     try {
@@ -130,26 +161,22 @@ const useAd = () => {
     }
   };
 
-  const postAd = async (adData, image) => {
-    const formData = new FormData();
-    for (const key in adData) {
-      formData.append(key, adData[key]);
-    }
-    formData.append("image", image);
-
+  // Post a new ad
+  const postAd = async (adData) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/ad/`, {
+      const response = await fetch(`${API_URL}/ad/post`, {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(adData),
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Error creating ad");
+      if (!response.ok) throw new Error("Error posting ad");
 
       const data = await response.json();
       return data;
     } catch (err) {
-      setError(err.message || "Error creating ad");
+      setError(err.message || "Error posting ad");
       throw err;
     } finally {
       setLoading(false);
@@ -177,6 +204,7 @@ const useAd = () => {
     }
   };
 
+  // Like an ad
   const likeAd = async (adId) => {
     setLoading(true);
     try {
@@ -209,7 +237,8 @@ const useAd = () => {
     fetchMyAds,
     fetchPurchasedAds,
     fetchActiveAds,
-    markAdAsSold,
+    buyAd,
+    verifyAndMarkAsSold,
     deleteAd,
     postAd,
     addReview,

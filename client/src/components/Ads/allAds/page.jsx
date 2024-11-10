@@ -12,7 +12,7 @@ const AllAds = () => {
 
   const handleLike = async (adId) => {
     await likeAd(adId);
-    fetchAds(); // Refresh ads to update like count
+    fetchAds();
   };
 
   const handleViewDetails = (adId) => {

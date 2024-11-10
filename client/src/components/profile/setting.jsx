@@ -8,13 +8,13 @@ const Settings = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    profileImg: ""
+    profileImg: "",
   });
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,7 +26,7 @@ const Settings = () => {
       setFormData({
         username: profile.username || "",
         email: profile.email || "",
-        profileImg: profile.profileImg || ""
+        profileImg: profile.profileImg || "",
       });
     }
   }, [profile]);
@@ -35,7 +35,7 @@ const Settings = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -43,7 +43,7 @@ const Settings = () => {
     const file = e.target.files[0];
     setFormData((prev) => ({
       ...prev,
-      profileImg: file // Store the file directly
+      profileImg: file,
     }));
   };
 
@@ -51,7 +51,7 @@ const Settings = () => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -69,13 +69,13 @@ const Settings = () => {
       const { data } = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/user/profile`,
         formDataToSend,
-        { 
+        {
           headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true
+          withCredentials: true,
         }
       );
       console.log(data);
-      await getProfile(); // Refresh the profile after update
+      await getProfile();
     } catch (err) {
       console.error("Error updating profile", err);
     } finally {
@@ -95,13 +95,17 @@ const Settings = () => {
     try {
       const passwordUpdateData = {
         currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
+        newPassword: passwordData.newPassword,
       };
 
       const { data } = await updatePassword(passwordUpdateData);
       console.log(data);
       setError(null);
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     } catch (err) {
       setError("Failed to update password.");
       console.error("Error updating password", err);
@@ -115,99 +119,111 @@ const Settings = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-gray-900 text-white p-4 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-center">Update Profile</h2>
-      <form onSubmit={handleProfileUpdate} className="space-y-4">
-        <div>
-          <label className="block font-medium">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
+    <div className="p-8 bg-gradient-to-b from-[#0A2472] to-[#0E6BA8] text-white min-h-screen flex flex-col items-center">
+      <div className="max-w-md mx-auto space-y-8">
+        {/* Update Profile Box */}
+        <div className="bg-gray-100 text-black p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-semibold text-center mb-4">
+            Update Profile
+          </h2>
+          <form onSubmit={handleProfileUpdate} className="space-y-4">
+            <div>
+              <label className="block font-medium">Username</label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">Profile Image</label>
+              <input
+                type="file"
+                name="image"
+                onChange={handleFileChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
+
+            <div className="text-center">
+              <button
+                type="submit"
+                disabled={isUpdating}
+                className="bg-blue-600 text-white px-6 py-2 rounded-full"
+              >
+                {isUpdating ? "Updating..." : "Update Profile"}
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div>
-          <label className="block font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
-        </div>
+        {/* Change Password Box */}
+        <div className="bg-gray-100 text-black p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-semibold text-center mb-4">
+            Change Password
+          </h2>
+          <form onSubmit={handlePasswordUpdate} className="space-y-4">
+            <div>
+              <label className="block font-medium">Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
 
-        <div>
-          <label className="block font-medium">Profile Image</label>
-          <input
-            type="file"
-            name="image"
-            onChange={handleFileChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
-        </div>
+            <div>
+              <label className="block font-medium">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
 
-        <div className="text-center">
-          <button
-            type="submit"
-            disabled={isUpdating}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full"
-          >
-            {isUpdating ? "Updating..." : "Update Profile"}
-          </button>
-        </div>
-      </form>
+            <div>
+              <label className="block font-medium">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                className="w-full p-2 bg-gray-100 border border-gray-600 rounded-md text-black"
+              />
+            </div>
 
-      <h2 className="text-2xl font-semibold text-center mt-8">Change Password</h2>
-      <form onSubmit={handlePasswordUpdate} className="space-y-4">
-        <div>
-          <label className="block font-medium">Current Password</label>
-          <input
-            type="password"
-            name="currentPassword"
-            value={passwordData.currentPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
-        </div>
+            {error && <p className="text-red-500 text-center">{error}</p>}
 
-        <div>
-          <label className="block font-medium">New Password</label>
-          <input
-            type="password"
-            name="newPassword"
-            value={passwordData.newPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
+            <div className="text-center">
+              <button
+                type="submit"
+                disabled={isPasswordUpdating}
+                className="bg-blue-600 text-white px-6 py-2 rounded-full"
+              >
+                {isPasswordUpdating ? "Updating..." : "Update Password"}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div>
-          <label className="block font-medium">Confirm New Password</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={passwordData.confirmPassword}
-            onChange={handlePasswordChange}
-            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
-          />
-        </div>
-
-        {error && <p className="text-red-500 text-center">{error}</p>}
-
-        <div className="text-center">
-          <button
-            type="submit"
-            disabled={isPasswordUpdating}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full"
-          >
-            {isPasswordUpdating ? "Updating..." : "Update Password"}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };
