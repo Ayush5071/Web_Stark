@@ -1,4 +1,6 @@
+import { sendPaymentSuccessEmail } from "../helper/emailService.js";
 import { createRazorpayInstance } from "../helper/razorPayConfig.js";
+import crypto from 'crypto';
 import Ad from "../models/ad.model.js";
 import User from "../models/user.model.js";
 
@@ -94,11 +96,14 @@ export const adBuy = async (req, res) => {
         const { adId } = req.params;
         const { price } = req.body;
 
+        // Fetch the ad details from the database
         const ad = await Ad.findById(adId);
         if (!ad) {
+            console.log("Ad not found");
             return res.status(404).json({ error: "Ad not found" });
         }
 
+        // Creating Razorpay order
         const options = {
             amount: price * 100,  // Amount in paise (Razorpay format)
             currency: "INR",
@@ -110,6 +115,7 @@ export const adBuy = async (req, res) => {
             console.log("Order response ->", order);
             return res.status(200).json(order);
         } catch (error) {
+            console.error("Error in Razorpay order creation:", error.message);
             return res.status(500).json({
                 success: false,
                 message: "Order creation failed",
@@ -118,8 +124,8 @@ export const adBuy = async (req, res) => {
         }
 
     } catch (error) {
-        console.log("Error in initiating payment:", error);
-        res.status(500).json({
+        console.error("Error in initiating payment:", error);
+        return res.status(500).json({
             error: "Something went wrong while starting the payment",
         });
     }
@@ -127,10 +133,13 @@ export const adBuy = async (req, res) => {
 
 export const markAsSold = async (req, res) => {
     try {
+        console.log("aya ho yha pr");
         const { adId } = req.params;
         const { order_id, payment_id, signature } = req.body;
         const buyerId = req.user.userId;
         const secret = process.env.RAZORPAY_KEY_SECRET;
+
+        console.log("Received payment verification data:", { order_id, payment_id, signature });
 
         // Verifying the payment signature
         const hmac = crypto.createHmac("sha256", secret);
@@ -138,14 +147,17 @@ export const markAsSold = async (req, res) => {
         const generatedSignature = hmac.digest("hex");
 
         if (generatedSignature !== signature) {
+            console.log("Payment verification failed: Invalid signature");
             return res.status(400).json({
                 success: false,
                 message: "Payment verification failed",
             });
         }
 
+        // Fetching the ad from the database
         const ad = await Ad.findById(adId);
         if (!ad) {
+            console.log("Ad not found for marking as sold");
             return res.status(404).json({
                 error: "Ad not found",
             });
@@ -156,10 +168,17 @@ export const markAsSold = async (req, res) => {
         ad.soldTo = buyerId;
         await ad.save();
 
-        // Update the user's purchasedAds list
+        console.log("Ad marked as sold:", ad);
+
+        // Update the buyer's purchasedAds array
         const user = await User.findById(buyerId);
         user.purchasedAds.push(ad._id);
         await user.save();
+
+        console.log("User's purchased ads updated:", user.purchasedAds);
+
+        // Send a success email to the buyer
+        await sendPaymentSuccessEmail(user.email, ad.title, payment_id);
 
         return res.status(200).json({
             success: true,
@@ -173,7 +192,6 @@ export const markAsSold = async (req, res) => {
         });
     }
 };
-
 export const getMyPurchasedAds = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -243,6 +261,8 @@ export const addReviewToAd = async (req, res) => {
     try {
         const { adId } = req.params;
         const { comment } = req.body;
+
+        console.log(comment,"mila comment");
         const userId = req.user.userId;
 
         const ad = await Ad.findById(adId);

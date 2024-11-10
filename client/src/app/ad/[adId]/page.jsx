@@ -1,83 +1,152 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
 import useAd from "@/hooks/useAd";
 import ReviewList from "@/components/Ads/components/ReviewList";
 import ReviewForm from "@/components/Ads/components/ReviewForm";
+import { toast } from "react-hot-toast";
 
 const IndividualAdPage = () => {
-  const { adId } = useParams(); // Fetch the adId from the URL params
-  const { adDetails, getIndividualAd, loading, error } = useAd();
+  const { adId } = useParams();
+  const { adDetails, getIndividualAd, buyAd, verifyAndMarkAsSold, loading, error } = useAd();
   const [reviewsUpdated, setReviewsUpdated] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
+  // Load Razorpay script only once
   useEffect(() => {
+    if (!razorpayLoaded) {
+      const loadRazorpayScript = () => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = () => {
+          setRazorpayLoaded(true);
+          console.log("Razorpay script loaded successfully.");
+        };
+        script.onerror = () => {
+          toast.error("Failed to load Razorpay script");
+          console.error("Error loading Razorpay script.");
+        };
+        document.body.appendChild(script);
+      };
+
+      loadRazorpayScript();
+    }
+
     if (adId && !adDetails) {
-      getIndividualAd(adId); // Fetch ad details only when adId is present
+      console.log("Fetching ad details for adId:", adId);
       getIndividualAd(adId);
     }
-  }, [adId, adDetails, getIndividualAd]);
-
-  const handleReviewAdded = () => {
-    setReviewsUpdated(true);
-  };
+  }, [adId, adDetails, razorpayLoaded, getIndividualAd]);
 
   useEffect(() => {
     if (reviewsUpdated) {
+      console.log("Refreshing ad details after review added...");
       getIndividualAd(adId);
       setReviewsUpdated(false);
     }
   }, [reviewsUpdated, adId, getIndividualAd]);
 
-  if (loading) {
-    return <p className="text-center text-lg text-gray-600">Loading...</p>;
-  }
+  const handleReviewAdded = () => {
+    console.log("Review added, updating reviews...");
+    setReviewsUpdated(true);
+  };
 
-  if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
-  }
+  const handleBuyNow = async () => {
+    if (!razorpayLoaded) {
+      console.error("Razorpay is not loaded yet.");
+      toast.error("Razorpay is not loaded. Please try again.");
+      return;
+    }
+
+    if (!adDetails || !adDetails.price) {
+      console.error("Ad details or price is missing.");
+      toast.error("Ad details are missing or incomplete.");
+      return;
+    }
+
+    try {
+      console.log("Initiating ad purchase for adId:", adId);
+      const orderData = await buyAd(adId, adDetails.price);
+      console.log("Order created successfully:", orderData);
+
+      const paymentResult = await initiateRazorpay(orderData);
+      console.log("Payment result received:", paymentResult);
+
+      await verifyAndMarkAsSold(adId, paymentResult.razorpay_order_id, paymentResult.razorpay_payment_id, paymentResult.razorpay_signature);
+      console.log("Ad marked as sold after successful payment.");
+      toast.success("Purchase successful! Ad has been marked as sold.");
+    } catch (err) {
+      console.error("Error during purchase process:", err);
+      toast.error("Purchase failed, please try again.");
+    }
+  };
+
+  const initiateRazorpay = (orderData) => {
+    return new Promise((resolve, reject) => {
+      console.log("Opening Razorpay checkout...");
+
+      if (!orderData || !orderData.id || !orderData.amount) {
+        console.error("Invalid order data:", orderData);
+        return reject("Invalid order data");
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Your Razorpay key
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.id,
+        handler: (response) => {
+          console.log("Payment successful:", response);
+          resolve(response);
+        },
+        prefill: { email: "user@example.com" }, // Prefill details
+        theme: { color: "#3399cc" },
+        modal: {
+          escape: true,
+          ondismiss: () => console.log("Payment modal dismissed"), // Handle modal dismiss
+        },
+      };
+
+      try {
+        if (window.Razorpay) {
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } else {
+          console.error("Razorpay script not loaded correctly.");
+          reject("Razorpay script not loaded");
+        }
+      } catch (error) {
+        console.error("Error opening Razorpay checkout:", error);
+        reject(error);
+      }
+    });
+  };
+
+  if (loading) return <p className="text-center text-lg text-gray-600">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white py-10">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-10 px-4">
       {adDetails ? (
-        <div className="w-full max-w-2xl bg-whiterounded-lg overflow-hidden lg:max-w-lg md:w-11/12 sm:w-full text-black text-center border-gray-400 border rounded-lg">
-          <div className="pt-5">
-            <h1 className="text-3xl font-bold mb-2">{adDetails.title}</h1>
+        <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white rounded-lg overflow-hidden shadow-lg">
+          {/* Ad image and details */}
+          <div className="md:w-1/2 p-4 flex justify-center">
+            <img src={adDetails.imageurl} alt={adDetails.title} className="w-full max-h-96 object-cover rounded-lg shadow-lg" />
           </div>
-
-          <div className="p-4">
-            <img
-              src={adDetails.imageurl}
-              alt={adDetails.title}
-              className="w-full h-80 object-cover rounded-lg mb-5 shadow-lg"
-            />
+          <div className="md:w-1/2 p-6 flex flex-col space-y-4">
+            <h2 className="text-2xl font-bold">{adDetails.title}</h2>
+            <p className="text-gray-600">{adDetails.description}</p>
+            <p className="text-gray-800 font-semibold">Price: ₹{adDetails.price}</p>
+            <button onClick={handleBuyNow} className="mt-4 px-6 py-2 text-white bg-blue-500 rounded-lg">
+              Buy Now
+            </button>
+            <ReviewList adId={adId} />
+            <ReviewForm adId={adId} onReviewAdded={handleReviewAdded} />
           </div>
-
-          <p className="text-lg font-semibold mb-2">
-            Price: ${adDetails.price}
-          </p>
-          <p className="text-lg mb-4">{adDetails.location}</p>
-          {/* <p className="text-lg mb-3">{adDetails.likes}</p> */}
         </div>
       ) : (
-        <p className="text-center text-gray-600 text-lg">Ad not found</p>
-      )}
-
-      {adDetails && (
-        <>
-          <hr className="my-5 w-[90%]  border-gray-300" />
-          <div className="w-full max-w-2xl rounded-lg overflow-hidden lg:max-w-lg md:w-11/12 sm:w-full text-black">
-            <div className="p-4 mb-4">
-              <ReviewForm adId={adId} />
-            </div>
-          </div>
-          <hr className="my-5 w-[90%]  border-gray-300" />
-          <div className="w-full max-w-2xl rounded-lg overflow-hidden lg:max-w-lg md:w-11/12 sm:w-full text-black">
-            <div className="p-4">
-              <ReviewList adId={adId} />
-            </div>
-          </div>
-        </>
+        <p>No ad details found.</p>
       )}
     </div>
   );

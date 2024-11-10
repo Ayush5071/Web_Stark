@@ -13,7 +13,7 @@ const MyAds = () => {
     if (confirm("Are you sure you want to delete this ad?")) {
       try {
         await deleteAd(adId);
-        fetchMyAds(); // Refresh ads after deleting
+        fetchMyAds();
         alert("Ad deleted successfully!");
       } catch (err) {
         console.error("Failed to delete ad:", err);
