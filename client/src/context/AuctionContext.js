@@ -10,6 +10,7 @@ export const useAuction = () => {
 export const AuctionProvider = ({ children }) => {
   const [activeAuctions, setActiveAuctions] = useState([]);
   const [myAuction, setMyAuction] = useState(null);
+  const [wonAuctions, setWonAuctions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -92,6 +93,7 @@ export const AuctionProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log(data, "data at my auction");
       setLoading(false);
 
       if (!response.ok) throw new Error(data.error || "Failed to fetch your auction");
@@ -103,17 +105,39 @@ export const AuctionProvider = ({ children }) => {
     }
   };
 
+  const getWonAuctions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/auction/wonAuction`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (!response.ok) throw new Error(data.error || "Failed to fetch won auctions");
+
+      setWonAuctions(data);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <AuctionContext.Provider
       value={{
         activeAuctions,
         myAuction,
+        wonAuctions,
         loading,
         error,
         createAuction,
         getActiveAuctions,
         placeBid,
         getMyAuction,
+        getWonAuctions,
       }}
     >
       {children}

@@ -14,8 +14,8 @@ router.get('/claimed', getClaimedItems);
 
 router.get('/unclaimed', getUnclaimedItems);
 
-router.get('/my-claimed', getMyClaimedItems);
+router.get('/my-claimed', isAuthenticated,getMyClaimedItems);
 
-router.get('/my-uploaded', getMyUploadedItems);    
+router.get('/my-uploaded', isAuthenticated,getMyUploadedItems);    
 
 export default router;

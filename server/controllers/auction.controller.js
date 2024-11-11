@@ -85,16 +85,35 @@ export const getMyAuction = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const auction = await Auction.findOne({ createdBy: userId })
-      .populate("createdBy", "username email")
-      .populate("highestBid.user", "username email");
+    const user = await User.findById(userId).populate('auctions');
 
-    if (!auction) {
+    if (!user || user.auctions.length === 0) {
       return res.status(404).json({ error: "No Auctions Created" });
     }
 
-    return res.status(200).json(auction);
+    // If auctions are found, return them
+    return res.status(200).json(user.auctions);
   } catch (error) {
+    console.error("Error fetching user's auctions:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const wonAuction = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const auctions = await Auction.find({
+      'highestBid.user': userId,
+      active: false,
+    }).populate('highestBid.user', 'username email');
+
+    if (!auctions) {
+      return res.status(200).json({ message: 'No auctions found where you won.' });
+    }
+
+    return res.status(200).json(auctions);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
