@@ -11,7 +11,7 @@ router.post('/login',loginUser);
 
 router.post('/verify-otp/:id', verifyOTP);
 
-router.get('/logout',isAuthenticated,logoutUser);
+router.get('/logout',logoutUser);
 
 router.get('/profile',isAuthenticated,getProfile);
 

@@ -4,25 +4,28 @@ import { useAuction } from "@/context/AuctionContext";
 import { useRouter } from "next/navigation";
 
 const WonAuctions = () => {
-  const { wonAuctions, loading, error, getWonAuctions } = useAuction();
+  const { wonAuctions, loading, getWonAuctions } = useAuction();
   const router = useRouter();
 
   useEffect(() => {
     if (wonAuctions.length === 0) {
       getWonAuctions();
     }
-  }, []);  
+  }, [wonAuctions.length]); // Adding wonAuctions.length as a dependency
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   if (wonAuctions.length === 0) {
-    return <div>No auctions won yet.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center">
+        <div className="text-lg font-semibold text-gray-600">No Auctions Won</div>
+        <div className="bg-blue-100 text-blue-800 px-6 py-4 rounded-lg shadow-md">
+          You haven't won any auctions yet. Keep exploring new opportunities!
+        </div>
+      </div>
+    );
   }
 
   return (

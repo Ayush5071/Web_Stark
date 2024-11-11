@@ -69,22 +69,22 @@ const ActiveAuctions = () => {
 
   return (
     <div className="p-4 text-white">
-      <h2 className="text-2xl font-bold mb-4">Active Auctions</h2>
+      <h2 className="text-2xl text-zinc-950 font-bold mb-4">Active Auctions</h2>
       {activeAuctions.length ? (
         activeAuctions.map((auction) => {
           const timeLeft = calculateTimeLeft(auction.endTime);
 
           return (
-            <div key={auction._id} className="p-4 bg-gray-800 shadow-md mb-4 rounded-md">
+            <div key={auction._id} className="p-4 bg-zinc-800 shadow-md mb-4 rounded-md">
               <h3 className="font-semibold text-xl">{auction.title}</h3>
-              <p className="text-gray-400">{auction.description}</p>
+              <p className="text-zinc-400">{auction.description}</p>
               <p className="mt-2">
                 Highest Bid:{" "}
                 {auction.highestBid && auction.highestBid.amount > 0
                   ? auction.highestBid.amount
                   : "No bids yet"} by {auction.highestBid?.user?.username || "N/A"}
               </p>
-              <div className="mt-2 text-sm text-gray-300">
+              <div className="mt-2 text-sm text-zinc-300">
                 {timeLeft ? (
                   <>
                     <p>Time Left:</p>

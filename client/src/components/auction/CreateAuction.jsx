@@ -17,7 +17,7 @@ const CreateAuction = () => {
 
   return (
     <form onSubmit={handleSubmit} className="p-4 bg-white shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Create Auction</h2>
+      <h2 className="text-2xl text-zinc-900 font-bold mb-4">Create Auction</h2>
       <input
         type="text"
         placeholder="Title"
