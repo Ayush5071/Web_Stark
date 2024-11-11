@@ -1,8 +1,8 @@
 import Interaction from "../models/interaction.model.js";
 
 export const capture = async (req, res) => {
-    const { productId, interaction_type, rating  } = req.body;
-    const userId = req.user.usrId
+    const { userId,productId, interaction_type, rating  } = req.body;
+    // const userId = req.user.userId
   if (!userId || !productId || !interaction_type) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -31,7 +31,7 @@ export const capture = async (req, res) => {
 
 export const prodectdataofuser = async (req, res) => {
   try {
-    const { userId } = req.query;  // Get the userId from the query string
+    const { userId } = req.body;  // Get the userId from the query string
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });

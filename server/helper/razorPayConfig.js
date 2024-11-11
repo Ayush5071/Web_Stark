@@ -1,6 +1,5 @@
-import razorpay from "razorpay";
-import dotenv from "dotenv"
-
+import dotenv from "dotenv";
+import razorpay from 'razorpay';
 dotenv.config();
 
 export const createRazorpayInstance = () => {
