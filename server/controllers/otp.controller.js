@@ -86,7 +86,7 @@ export const verifyOTP = async (req, res) => {
     await user.save();
 
     await OTP.deleteOne({ _id: otpEntry._id });
-    return res.status(200).json({ message: 'OTP verified successfully' });
+    return res.status(200).json(user);
 
   } catch (error) {
     console.error("Error in verifyOTP function:", error);

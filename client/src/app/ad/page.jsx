@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-// Import your components
+
+
 import Allads from "@/components/Ads/allAds/page";
 import ActiveAds from "@/components/Ads/Activeads/page";
 import CreateAds from "@/components/Ads/createAds/page";
@@ -15,70 +16,46 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex bg-gray-100 min-h-screen">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-800 text-white p-5 h-full">
-        <h2 className="text-xl font-bold mb-6">Dashboard</h2>
-        <ul className="space-y-4">
-          <li>
-            <button
-              className={`w-full text-left p-2 rounded-lg hover:bg-gray-600 ${
-                selected === "Allads" ? "bg-gray-600" : ""
-              }`}
-              onClick={() => handleNavigation("Allads")}
-            >
-              All Ads
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left p-2 rounded-lg hover:bg-gray-600 ${
-                selected === "ActiveAds" ? "bg-gray-600" : ""
-              }`}
-              onClick={() => handleNavigation("ActiveAds")}
-            >
-              Active Ads
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left p-2 rounded-lg hover:bg-gray-600 ${
-                selected === "CreateAds" ? "bg-gray-600" : ""
-              }`}
-              onClick={() => handleNavigation("CreateAds")}
-            >
-              Create Ads
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left p-2 rounded-lg hover:bg-gray-600 ${
-                selected === "MyAds" ? "bg-gray-600" : ""
-              }`}
-              onClick={() => handleNavigation("MyAds")}
-            >
-              My Ads
-            </button>
-          </li>
-          <li>
-            <button
-              className={`w-full text-left p-2 rounded-lg hover:bg-gray-600 ${
-                selected === "MyPurchases" ? "bg-gray-600" : ""
-              }`}
-              onClick={() => handleNavigation("MyPurchases")}
-            >
-              My Purchases
-            </button>
-          </li>
-        </ul>
+      <div className="w-1/5 bg-white shadow-2xl pt-6 pr-6 rounded-tr-lg rounded-br-lg overflow-y-auto mt-24 mb-8 pb-6">
+        <div className="w-full bg-gradient-to-b from-[#0A2472] to-[#0E6BA8] text-white p-5 h-full rounded-tr-lg rounded-br-lg">
+          <h2 className="text-2xl font-bold mb-8 text-center">Dashboard</h2>
+          <ul className="space-y-4">
+            {[
+              { label: "All Ads", key: "Allads" },
+              { label: "Active Ads", key: "ActiveAds" },
+              { label: "Create Ads", key: "CreateAds" },
+              { label: "My Ads", key: "MyAds" },
+              { label: "My Purchases", key: "MyPurchases" },
+            ].map((item) => (
+              <li key={item.key}>
+                <button
+                  className={`w-full text-left p-3 rounded-lg transition duration-300 
+                  ${
+                    selected === item.key
+                      ? "bg-white text-[#0A2472] font-semibold"
+                      : "text-white hover:bg-white/10"
+                  }`}
+                  onClick={() => handleNavigation(item.key)}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="flex-1 bg-gray-100 p-6 pt-32 h-full">
-        {selected === "Allads" && <Allads />}
-        {selected === "ActiveAds" && <ActiveAds />}
-        {selected === "CreateAds" && <CreateAds />}
-        {selected === "MyAds" && <MyAds />}
-        {selected === "MyPurchases" && <MyPurchases />}
+      {/* Content Area */}
+      <div className="flex-1 bg-grey-100 p-8 pt-24 overflow-y-auto">
+        <div className="bg-gradient-to-b from-[#F5F7FA] to-[#EBF1F5] shadow-2xl rounded-lg p-6">
+          {selected === "Allads" && <Allads />}
+          {selected === "ActiveAds" && <ActiveAds />}
+          {selected === "CreateAds" && <CreateAds />}
+          {selected === "MyAds" && <MyAds />}
+          {selected === "MyPurchases" && <MyPurchases />}
+        </div>
       </div>
     </div>
   );

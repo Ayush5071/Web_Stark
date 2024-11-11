@@ -11,7 +11,7 @@ const ReviewSection = ({ adId, reviews, onReviewAdded }) => {
 
     if (reviewText.trim()) {
       const newReview = {
-        user: "Current User", // Use real user data if available
+        user: "Current User", 
         comment: reviewText,
       };
 
@@ -36,18 +36,20 @@ const ReviewSection = ({ adId, reviews, onReviewAdded }) => {
 
   return (
     <div className="mt-8 space-y-8">
-      <h3 className="text-2xl font-semibold text-gray-100 mb-6">Reviews</h3>
+      <h3 className="text-2xl font-semibold mb-6">Reviews</h3>
       {/* Display existing reviews */}
       <div className="space-y-6">
         {reviews.length > 0 ? (
           reviews.map((review, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded-lg">
-              <p className="text-sm text-gray-300">By: <strong>{review.user}</strong></p>
-              <p className="text-gray-300 mt-2">{review.comment}</p>
+            <div key={index} className="p-4 rounded-lg">
+              <p className="text-sm">
+                By: <strong>{review.user}</strong>
+              </p>
+              <p className="mt-2">{review.comment}</p>
             </div>
           ))
         ) : (
-          <div className="bg-gray-700 p-4 rounded-lg">
+          <div className=" p-4 rounded-lg">
             <p className="text-gray-300">No reviews yet.</p>
           </div>
         )}
@@ -55,7 +57,9 @@ const ReviewSection = ({ adId, reviews, onReviewAdded }) => {
 
       {/* Add Review Form */}
       <div className="mt-8">
-        <h3 className="text-2xl font-semibold text-gray-100 mb-4">Add a Review</h3>
+        <h3 className="text-2xl font-semibold text-gray-100 mb-4">
+          Add a Review
+        </h3>
         <form onSubmit={handleReviewSubmit} className="space-y-4">
           <textarea
             className="w-full p-4 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

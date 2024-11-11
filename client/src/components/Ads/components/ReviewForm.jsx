@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import useAd from "@/hooks/useAd"; // Adjust the path as needed
+import useAd from "@/hooks/useAd";
 
-const ReviewForm = ({ adId }) => {
+const ReviewForm = ({ adId, onReviewAdded }) => {
   const { addReview } = useAd();
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +22,9 @@ const ReviewForm = ({ adId }) => {
     try {
       await addReview(adId, comment);
       console.log("Review successfully added!");
-      setComment(""); // Clear the textarea after submission
+      setComment(""); 
+
+      if (onReviewAdded) onReviewAdded(); 
     } catch (error) {
       console.error("Error adding review:", error);
     } finally {
@@ -32,15 +34,19 @@ const ReviewForm = ({ adId }) => {
 
   return (
     <div className="review-form">
-      <h3>Leave a Review</h3>
+      <h3 className="text-2xl mb-4">Leave a Review</h3>
       <form onSubmit={handleSubmit}>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Write your review..."
           required
+          className="border border-gray-400 rounded-lg w-full h-24 mb-3"
         />
-        <button type="submit" disabled={isSubmitting}>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="border border-black rounded-lg px-3 py-1"
+        >
           {isSubmitting ? "Submitting..." : "Submit Review"}
         </button>
       </form>

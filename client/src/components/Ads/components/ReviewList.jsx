@@ -1,42 +1,59 @@
 "use client";
-import useAd from "@/hooks/useAd";
 import React, { useEffect, useState } from "react";
+import useAd from "@/hooks/useAd";
 
 const ReviewList = ({ adId }) => {
-  const { adDetails, getIndividualAd } = useAd();
+  const { adDetails, getIndividualAd, loading, error } = useAd();
   const [reviews, setReviews] = useState([]);
+  const [shouldRefetch, setShouldRefetch] = useState(true);
 
-  // Fetch reviews for the ad when the component mounts or adDetails change
+  console.log("Received adId:", adId);
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      if (adId) {
-        await getIndividualAd(adId); // Fetch ad details, including reviews
+    const fetchAdDetails = async () => {
+      if (adId && shouldRefetch) {
+        await getIndividualAd(adId);
+        setShouldRefetch(false); 
       }
     };
 
-    fetchReviews();
-  }, [adId, getIndividualAd]);
+    fetchAdDetails();
+  }, [adId, getIndividualAd, shouldRefetch]);
 
-  // Extract reviews from the ad details
   useEffect(() => {
-    if (adDetails && adDetails.reviews) {
+    if (adDetails?.reviews) {
       setReviews(adDetails.reviews);
     }
   }, [adDetails]);
 
+  console.log("Fetched adDetails:", adDetails);
+
+  const handleReviewAdded = () => {
+    setShouldRefetch(true);
+  };
+
+  if (loading) {
+    return <p className="text-center text-gray-500">Loading reviews...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">Error: {error}</p>;
+  }
+
   return (
-    <div className="reviews-section">
-      <h2>Reviews</h2>
-      {reviews && reviews.length > 0 ? (
-        <ul className="review-list">
+    <div className="reviews-section p-4 border-t border-gray-200">
+      <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+
+      {reviews.length > 0 ? (
+        <ul className="review-list mt-4 space-y-3">
           {reviews.map((review, index) => (
-            <li key={index} className="review-item">
-              <p>{review.comment}</p>
+            <li key={index} className="review-item p-3 bg-gray-100 rounded-md">
+              <p className="text-gray-800">{review.comment}</p>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No reviews yet.</p>
+        <p className="text-gray-600">No reviews yet.</p>
       )}
     </div>
   );
