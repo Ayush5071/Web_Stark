@@ -1,4 +1,4 @@
-import Interaction from '../models/interaction.model.js';
+import Interaction from "../models/interaction.model.js";
 
 export const capture = async (req, res) => {
     const { productId, interaction_type, rating  } = req.body;

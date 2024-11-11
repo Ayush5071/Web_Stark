@@ -34,4 +34,4 @@ const interactionSchema = new mongoose.Schema({
 
 const Interaction = mongoose.model('Interaction', interactionSchema);
 
-module.exports = Interaction;
+export default Interaction;
