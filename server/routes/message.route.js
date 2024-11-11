@@ -4,7 +4,7 @@ import { getActiveUsers, getMessage, postMessage } from "../controllers/message.
 
 const router = express.Router();
 
-router.get("/:id",isAuthenticated,getMessage);
+router.get("/get/:id",isAuthenticated,getMessage);
 
 router.post("/send/:id",isAuthenticated,postMessage);
 

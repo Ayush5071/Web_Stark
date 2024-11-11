@@ -1,5 +1,10 @@
+import { sendPaymentSuccessEmail } from "../helper/emailService.js";
+import { createRazorpayInstance } from "../helper/razorPayConfig.js";
+import crypto from 'crypto';
 import Ad from "../models/ad.model.js";
 import User from "../models/user.model.js";
+
+const razorpayInstance = createRazorpayInstance();
 
 export const getAd = async (req, res) => {
     try {
@@ -22,7 +27,9 @@ export const getAd = async (req, res) => {
 export const postAd = async (req, res) => {
     try {
         const { title, description, price, location, productType } = req.body;
+        console.log("title -",title);
         const imageurl = req.file.path;
+        console.log(imageurl,"img to  agyi");
         const seller = req.user.userId;
 
         console.log("img url", imageurl);
@@ -69,7 +76,7 @@ export const getMyAd = async (req, res) => {
             .populate('reviews.user', 'username'); 
 
         if (!myAds.length) {
-            return res.status(404).json({
+            return res.status(200).json({
                 message: "No ads found for this user"
             });
         }
@@ -84,38 +91,107 @@ export const getMyAd = async (req, res) => {
     }
 };
 
-export const markAsSold = async (req, res) => {
+export const adBuy = async (req, res) => {
     try {
         const { adId } = req.params;
-        const buyerId = req.user.userId;
+        const { price } = req.body;
 
+        // Fetch the ad details from the database
         const ad = await Ad.findById(adId);
-
         if (!ad) {
-            return res.status(404).json({
-                error: "Ad not found"
+            console.log("Ad not found");
+            return res.status(404).json({ error: "Ad not found" });
+        }
+
+        // Creating Razorpay order
+        const options = {
+            amount: price * 100,  // Amount in paise (Razorpay format)
+            currency: "INR",
+            receipt: `receipt_order_${ad._id}`,
+        };
+
+        try {
+            const order = await razorpayInstance.orders.create(options);
+            console.log("Order response ->", order);
+            return res.status(200).json(order);
+        } catch (error) {
+            console.error("Error in Razorpay order creation:", error.message);
+            return res.status(500).json({
+                success: false,
+                message: "Order creation failed",
+                error: error.message,
             });
         }
 
-        ad.status = 'sold';
-        ad.soldTo = buyerId; 
-        await ad.save();
-
-        const user = await User.findById(buyerId);
-        user.purchasedAds.push(ad._id);
-        await user.save();
-
-        return res.status(200).json(ad);  
     } catch (error) {
-        console.error('Error marking ad as sold:', error);
+        console.error("Error in initiating payment:", error);
         return res.status(500).json({
-            error: "Something went wrong while marking the ad as sold",
-            error
+            error: "Something went wrong while starting the payment",
         });
     }
 };
 
+export const markAsSold = async (req, res) => {
+    try {
+        console.log("aya ho yha pr");
+        const { adId } = req.params;
+        const { order_id, payment_id, signature } = req.body;
+        const buyerId = req.user.userId;
+        const secret = process.env.RAZORPAY_KEY_SECRET;
 
+        console.log("Received payment verification data:", { order_id, payment_id, signature });
+
+        // Verifying the payment signature
+        const hmac = crypto.createHmac("sha256", secret);
+        hmac.update(`${order_id}|${payment_id}`);
+        const generatedSignature = hmac.digest("hex");
+
+        if (generatedSignature !== signature) {
+            console.log("Payment verification failed: Invalid signature");
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification failed",
+            });
+        }
+
+        // Fetching the ad from the database
+        const ad = await Ad.findById(adId);
+        if (!ad) {
+            console.log("Ad not found for marking as sold");
+            return res.status(404).json({
+                error: "Ad not found",
+            });
+        }
+
+        // Mark the ad as sold and save the buyer info
+        ad.status = "sold";
+        ad.soldTo = buyerId;
+        await ad.save();
+
+        console.log("Ad marked as sold:", ad);
+
+        // Update the buyer's purchasedAds array
+        const user = await User.findById(buyerId);
+        user.purchasedAds.push(ad._id);
+        await user.save();
+
+        console.log("User's purchased ads updated:", user.purchasedAds);
+
+        // Send a success email to the buyer
+        await sendPaymentSuccessEmail(user.email, ad.title, payment_id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment verified and ad marked as sold",
+            ad,
+        });
+    } catch (error) {
+        console.error("Error marking ad as sold:", error);
+        return res.status(500).json({
+            error: "Something went wrong while marking the ad as sold",
+        });
+    }
+};
 export const getMyPurchasedAds = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -185,6 +261,8 @@ export const addReviewToAd = async (req, res) => {
     try {
         const { adId } = req.params;
         const { comment } = req.body;
+
+        console.log(comment,"mila comment");
         const userId = req.user.userId;
 
         const ad = await Ad.findById(adId);

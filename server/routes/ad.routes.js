@@ -1,6 +1,6 @@
 import express from 'express';
 import { isAuthenticated } from '../middlewares/isAuth.js';
-import { addReviewToAd, deleteAd, getActiveAds, getAd, getAdById, getMyAd, getMyPurchasedAds, likeAd, markAsSold, postAd } from '../controllers/ad.controller.js';
+import { adBuy, addReviewToAd, deleteAd, getActiveAds, getAd, getAdById, getMyAd, getMyPurchasedAds, likeAd, markAsSold, postAd } from '../controllers/ad.controller.js';
 import { upload } from '../helper/upload.js';
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.post('/', isAuthenticated,upload.single('image'), postAd);
 router.get('/myAd', isAuthenticated, getMyAd);
 
 router.get('/unique/:adId',isAuthenticated, getAdById);
+
+router.post('/adbuy/:adId',isAuthenticated,adBuy);
 
 router.post('/sold/:adId', isAuthenticated, markAsSold);
 

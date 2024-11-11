@@ -6,7 +6,7 @@ import { verifyOTP } from "@/lib/authApi/api";
 
 function Otp() {
   const router = useRouter();
-  const { auth, setVerified, setAuth } = useAuthContext();
+  const { auth, setIsVerified, setAuth } = useAuthContext();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(true); 
 
@@ -30,7 +30,7 @@ function Otp() {
       const response = await verifyOTP({ otp, userId });
 
       if (response) {
-        setVerified(true);
+        setIsVerified(true);
         setAuth(response);
         router.push("/");
       } else {
@@ -46,7 +46,7 @@ function Otp() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cover bg- bg-center"
+    <div className="flex items-center justify-center min-h-screen bg-cover bg-center"
     style={{
       backgroundImage: `url('/auth/back.png')`, 
    }}>
