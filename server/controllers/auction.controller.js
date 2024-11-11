@@ -91,7 +91,6 @@ export const getMyAuction = async (req, res) => {
       return res.status(404).json({ error: "No Auctions Created" });
     }
 
-    // If auctions are found, return them
     return res.status(200).json(user.auctions);
   } catch (error) {
     console.error("Error fetching user's auctions:", error);
@@ -107,6 +106,8 @@ export const wonAuction = async (req, res) => {
       'highestBid.user': userId,
       active: false,
     }).populate('highestBid.user', 'username email');
+
+    console.log("wiings ->",auctions);
 
     if (!auctions) {
       return res.status(200).json({ message: 'No auctions found where you won.' });

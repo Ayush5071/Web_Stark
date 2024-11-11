@@ -1,9 +1,11 @@
-"use client";
 import { useAuction } from "@/context/AuctionContext";
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 
-const socket = io();  // Assuming the server is set up correctly
+const socket = io('http://localhost:4000', {
+  transports: ['websocket', 'polling'],
+  withCredentials: true,
+});
 
 const ActiveAuctions = () => {
   const { activeAuctions, getActiveAuctions, placeBid } = useAuction();
@@ -13,19 +15,17 @@ const ActiveAuctions = () => {
     getActiveAuctions();
 
     socket.on("newBid", (data) => {
-      // Update the auction data with the new highest bid
       const updatedAuctions = activeAuctions.map((auction) => {
         if (auction._id === data.auctionId) {
           auction.highestBid = data.highestBid;
         }
         return auction;
       });
-      // You might want to set this state based on how you're managing auctions in your context
       setActiveAuctions(updatedAuctions);
     });
 
     return () => {
-      socket.off("newBid"); // Clean up listener when component unmounts
+      socket.off("newBid");
     };
   }, [activeAuctions, getActiveAuctions]);
 
@@ -93,32 +93,29 @@ const ActiveAuctions = () => {
                     </p>
                   </>
                 ) : (
-                  <p className="text-red-500">Auction Ended</p>
+                  <p>Auction Ended</p>
                 )}
               </div>
-
-              {timeLeft && (
-                <div className="mt-4">
-                  <input
-                    type="number"
-                    placeholder="Enter your bid"
-                    value={bidAmounts[auction._id] || ""}
-                    onChange={(e) => handleBidChange(e, auction._id)}
-                    className="w-full p-2 bg-gray-700 text-white rounded-md"
-                  />
-                  <button
-                    onClick={() => handlePlaceBid(auction._id)}
-                    className="mt-2 p-2 bg-green-500 text-white rounded-md w-full"
-                  >
-                    Place Bid
-                  </button>
-                </div>
-              )}
+              <div className="mt-4">
+                <input
+                  type="number"
+                  value={bidAmounts[auction._id] || ""}
+                  onChange={(e) => handleBidChange(e, auction._id)}
+                  className="border p-2 text-black"
+                  placeholder="Enter your bid"
+                />
+                <button
+                  onClick={() => handlePlaceBid(auction._id)}
+                  className="ml-2 p-2 bg-blue-500 text-white"
+                >
+                  Place Bid
+                </button>
+              </div>
             </div>
           );
         })
       ) : (
-        <p className="text-gray-400">No active auctions available.</p>
+        <p>No active auctions</p>
       )}
     </div>
   );

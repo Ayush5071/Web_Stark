@@ -5,12 +5,11 @@ import express from 'express';
 const app = express();
 const server = http.createServer(app);
 
-// CORS configuration for Socket.IO
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000', // Allow requests from any origin
+        origin: 'http://localhost:3000', 
         methods: ['GET', 'POST'],
-        credentials: true, // Allow credentials (cookies)
+        credentials: true, 
     },
 });
 
@@ -23,12 +22,11 @@ export const getReceiverSocketId = (receiverId) => {
 io.on('connection', (socket) => {
     console.log("A user connected:", socket.id);
     
-    const userId = socket.handshake.query.userId; // Get userId from query
+    const userId = socket.handshake.query.userId; 
     if (userId && userId !== "undefined") {
         userSocketMap[userId] = socket.id;
     }
     
-    // Emit the list of online users to all clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on("disconnect", () => {

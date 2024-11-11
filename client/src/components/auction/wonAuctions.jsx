@@ -8,8 +8,10 @@ const WonAuctions = () => {
   const router = useRouter();
 
   useEffect(() => {
-    getWonAuctions();
-  }, [getWonAuctions]);
+    if (wonAuctions.length === 0) {
+      getWonAuctions();
+    }
+  }, []);  
 
   if (loading) {
     return <div>Loading...</div>;
