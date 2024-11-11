@@ -1,13 +1,5 @@
 import mongoose from "mongoose";
-import tunnel from 'tunnel';
  
-const proxy = tunnel.httpsOverHttp({
-    proxy: {
-        host: 'proxy-ip',
-        port: 3128,
-        proxyAuth: 'edcguest:edcguest', // username and password
-    },
-});
 
 export const connectDb = async() => {
     try {
@@ -16,11 +8,7 @@ export const connectDb = async() => {
             throw new Error("mongo uri is not efiend in env variable");
         }
 
-        await mongoose.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-             agent:proxy,
-        });
+        await mongoose.connect(uri);
         console.log("db connected");
     } catch (error) {
         console.log("error connecting to db",error.message);               
