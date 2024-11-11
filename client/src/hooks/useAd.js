@@ -161,27 +161,34 @@ const useAd = () => {
     }
   };
 
-  // Post a new ad
-  const postAd = async (adData) => {
+  const postAd = async (adData, image) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/ad/post`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(adData),
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Error posting ad");
+        const formData = new FormData();
+        formData.append('title', adData.title);
+        formData.append('description', adData.description);
+        formData.append('price', adData.price);
+        formData.append('location', adData.location);
+        formData.append('productType', adData.productType);
+        formData.append('image', image);  // Append the image file
 
-      const data = await response.json();
-      return data;
+        const response = await fetch(`${API_URL}/ad`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+        });
+
+        if (!response.ok) throw new Error('Error posting ad');
+
+        const data = await response.json();
+        return data;
     } catch (err) {
-      setError(err.message || "Error posting ad");
-      throw err;
+        setError(err.message || 'Error posting ad');
+        throw err;
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const addReview = async (adId, comment) => {
     setLoading(true);

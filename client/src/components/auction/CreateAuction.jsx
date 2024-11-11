@@ -1,6 +1,7 @@
 "use client";
 import { useAuction } from "@/context/AuctionContext";
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 
 const CreateAuction = () => {
   const { createAuction } = useAuction();
@@ -11,42 +12,77 @@ const CreateAuction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!title || !description || !startingPrice || !duration) {
+      toast.error("Please fill out all fields.");
+      return;
+    }
     const auctionData = { title, description, startingPrice, duration };
-    await createAuction(auctionData);
+    try {
+      await createAuction(auctionData);
+      toast.success("Auction created successfully!");
+      setTitle("");
+      setDescription("");
+      setStartingPrice("");
+      setDuration("");
+    } catch (error) {
+      console.error("Error creating auction:", error);
+      toast.error("Failed to create auction. Please try again.");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white shadow-md">
-      <h2 className="text-2xl text-zinc-900 font-bold mb-4">Create Auction</h2>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      />
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      />
-      <input
-        type="number"
-        placeholder="Starting Price"
-        value={startingPrice}
-        onChange={(e) => setStartingPrice(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      />
-      <input
-        type="text"
-        placeholder="Duration (in hours)"
-        value={duration}
-        onChange={(e) => setDuration(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">Create</button>
-    </form>
+    <div className="p-8 bg-gradient-to-b from-zinc-900 via-zinc-800 to-zinc-700 text-white min-h-screen rounded-lg">
+      <h2 className="text-3xl font-bold mb-6 text-center text-zinc-100">Create Auction</h2>
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg mx-auto">
+        <div className="flex flex-col space-y-2">
+          <label className="text-zinc-300">Title</label>
+          <input
+            type="text"
+            placeholder="Enter auction title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="p-2 rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="text-zinc-300">Description</label>
+          <textarea
+            placeholder="Enter description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="p-2 rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200"
+          ></textarea>
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="text-zinc-300">Starting Price</label>
+          <input
+            type="number"
+            placeholder="Enter starting price"
+            value={startingPrice}
+            onChange={(e) => setStartingPrice(e.target.value)}
+            className="p-2 rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <label className="text-zinc-300">Duration (in hours)</label>
+          <input
+            type="text"
+            placeholder="Enter duration"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            className="p-2 rounded-md bg-zinc-800 border border-zinc-600 text-zinc-200"
+          />
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="w-1/3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold"
+          >
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 
