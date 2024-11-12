@@ -21,7 +21,7 @@ router.get('/mypurchases', isAuthenticated, getMyPurchasedAds);
 
 router.get('/active',getActiveAds);
 
-router.post('/:adId', isAuthenticated, deleteAd);
+router.delete('/:adId', isAuthenticated, deleteAd);
 
 router.post('/review/:adId',isAuthenticated, addReviewToAd);
 

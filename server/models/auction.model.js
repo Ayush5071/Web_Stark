@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import cron from 'node-cron';
 
 const auctionSchema = new mongoose.Schema({
   title: {
@@ -43,20 +44,17 @@ const auctionSchema = new mongoose.Schema({
   },
 });
 
-
-// method which can handle the endTime with respect to current time -- ! so just add time in min formwhich you need to open auction
 auctionSchema.methods.setEndTime = function (durationInMinutes) {
   const endTime = new Date();
-  endTime.setMinutes(endTime.getMinutes() + durationInMinutes);
+  endTime.setMinutes(endTime.getMinutes() + durationInMinutes);  
   this.endTime = endTime;
 };
 
-// method to find auctions thta are active !!
 auctionSchema.statics.getActiveAuctions = function () {
   return this.find({ active: true }).exec();
 };
 
-auctionSchema.methods.placeBid = function(userId, bidAmount) {
+auctionSchema.methods.placeBid = function (userId, bidAmount) {
   if (bidAmount <= this.highestBid.amount) {
     throw new Error('Bid must be higher than the current highest bid');
   }
@@ -64,5 +62,28 @@ auctionSchema.methods.placeBid = function(userId, bidAmount) {
   return this.save();
 };
 
+auctionSchema.methods.checkAndUpdateStatus = async function () {
+  const currentTime = new Date();
+  if (this.endTime <= currentTime) {
+    this.active = false;  
+    await this.save();
+  }
+};
+
+cron.schedule('* * * * *', async () => {
+  try {
+    const activeAuctions = await Auction.find({ active: true });
+
+    for (let auction of activeAuctions) {
+      await auction.checkAndUpdateStatus();  
+    }
+
+    console.log('Auction statuses checked and updated.');
+  } catch (error) {
+    console.error('Error updating auction statuses:', error);
+  }
+});
+
 const Auction = mongoose.model('Auction', auctionSchema);
+
 export default Auction;
