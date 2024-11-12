@@ -2,6 +2,7 @@
 import ActiveAuctions from "@/components/auction/ActiveAuctions";
 import CreateAuction from "@/components/auction/CreateAuction";
 import MyAuction from "@/components/auction/MyAuctions";
+import WonAuctions from "@/components/auction/wonAuctions";
 import React, { useState } from "react";
 import { FaGavel, FaList, FaClipboardList, FaCog } from "react-icons/fa";
 
@@ -37,10 +38,10 @@ const AuctionDashboard = () => {
             <FaClipboardList className="mr-2" /> My Auction
           </button>
           <button
-            onClick={() => handleTabChange("settings")}
+            onClick={() => handleTabChange("Winnings")}
             className="flex items-center w-full py-2 px-4 hover:bg-gray-700 rounded-md"
           >
-            <FaCog className="mr-2" /> Settings
+            <FaCog className="mr-2" /> Winnings
           </button>
         </div>
       </div>
@@ -56,6 +57,7 @@ const AuctionDashboard = () => {
           {activeTab === "createAuction" && <CreateAuction/>}
           {activeTab === "activeAuctions" && <ActiveAuctions/>}
           {activeTab === "myAuction" && <MyAuction/>}
+          {activeTab === "Winnings" && <WonAuctions/>}
         </div>
       </div>
     </div>

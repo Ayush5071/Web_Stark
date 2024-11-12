@@ -27,18 +27,12 @@ export const getAd = async (req, res) => {
 export const postAd = async (req, res) => {
     try {
         const { title, description, price, location, productType } = req.body;
-        console.log("title -",title);
-        const imageurl = req.file.path;
-        console.log(imageurl,"img to  agyi");
+        const imageurl = req.file ? req.file.path : null;
         const seller = req.user.userId;
-
-        console.log("img url", imageurl);
 
         const existingAd = await Ad.findOne({ title });
         if (existingAd) {
-            return res.status(400).json({
-                error: "An ad with this title already exists",
-            });
+            return res.status(400).json({ error: "An ad with this title already exists" });
         }
 
         const newAd = new Ad({
@@ -49,21 +43,19 @@ export const postAd = async (req, res) => {
             productType,
             location,
             seller,
-            status: 'active'
+            status: 'active',
         });
 
-        const response = await newAd.save();
+        const savedAd = await newAd.save();
 
         const user = await User.findById(seller);
-        user.ads.push(newAd._id);
+        user.ads.push(savedAd._id);
         await user.save();
 
-        return res.status(200).json(response);
+        return res.status(200).json(savedAd);
     } catch (error) {
         console.error('Error in creating ad:', error);
-        return res.status(500).json({
-            error: "Something went wrong in creating ad"
-        });
+        return res.status(500).json({ error: "Something went wrong in creating ad" });
     }
 };
 

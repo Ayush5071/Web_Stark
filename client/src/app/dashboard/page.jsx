@@ -1,157 +1,170 @@
-"use client"
-import React from 'react';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement
-} from 'chart.js';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+"use client";
+import { useEffect, useContext } from "react";
+import { toast } from "react-hot-toast";
+import { useAuction } from "@/context/AuctionContext";
+import useAd from "@/hooks/useAd";
+import { useStoreContext } from "@/context/storeContext";
+import { Line } from "react-chartjs-2";
+import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement } from "chart.js";
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement
-);
+// Register the necessary chart components
+ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
 
-const dashboard = () => {
-    const lineData = {
-        labels: ['plane', 'helicopter', 'boat', 'train', 'subway', 'bus', 'car', 'moto', 'bicycle'],
-        datasets: [
-            {
-                label: 'US',
-                data: [400, 300, 200, 400, 500, 200, 300, 200, 100],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            },
-            {
-                label: 'France',
-                data: [200, 400, 300, 200, 300, 400, 200, 100, 300],
-                borderColor: 'rgba(153, 102, 255, 1)',
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            },
-            {
-                label: 'Japan',
-                data: [100, 200, 400, 100, 300, 200, 400, 300, 200],
-                borderColor: 'rgba(255, 159, 64, 1)',
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-            },
-        ],
-    };
+const Dashboard = () => {
+  const {
+    activeAuctions,
+    getActiveAuctions,
+    loading: auctionLoading,
+    error: auctionError,
+  } = useAuction();
+  const {
+    stores,
+    fetchStores,
+    loading: storeLoading,
+    error: storeError,
+  } = useStoreContext();
+  const {
+    ads,
+    fetchAds,
+    loading: adLoading,
+    error: adError,
+  } = useAd();
 
-    const barData = {
-        labels: ['AD', 'AE', 'AF', 'AG', 'AI', 'AL', 'AM'],
-        datasets: [
-            {
-                label: 'Sales Quantity',
-                data: [200, 300, 400, 250, 450, 300, 200],
-                backgroundColor: [
-                    '#ff6384',
-                    '#36a2eb',
-                    '#cc65fe',
-                    '#ffce56',
-                    '#36eb96',
-                    '#ff9f40',
-                    '#4bc0c0',
-                ],
-            },
-        ],
-    };
+  // Fetch data if not already available
+  useEffect(() => {
+    if (!activeAuctions || activeAuctions.length === 0) {
+      getActiveAuctions();
+    }
+    if (!stores || stores.length === 0) {
+      fetchStores();
+    }
+    if (!ads || ads.length === 0) {
+      fetchAds();
+    }
+  }, [activeAuctions, stores, ads, getActiveAuctions, fetchStores, fetchAds]);
 
-    const pieData = {
-        labels: ['Donut', 'Fries', 'Kebab', 'Sandwich', 'Burger', 'Hot Dog'],
-        datasets: [
-            {
-                label: 'Revenue Generated',
-                data: [300, 50, 100, 40, 120, 75],
-                backgroundColor: [
-                    '#ff6384',
-                    '#36a2eb',
-                    '#cc65fe',
-                    '#ffce56',
-                    '#36eb96',
-                    '#ff9f40',
-                ],
-            },
-        ],
-    };
+  // Handle errors
+  useEffect(() => {
+    if (auctionError) {
+      toast.error(`Error fetching auctions: ${auctionError}`);
+    }
+    if (storeError) {
+      toast.error(`Error fetching stores: ${storeError}`);
+    }
+    if (adError) {
+      toast.error(`Error fetching ads: ${adError}`);
+    }
+  }, [auctionError, storeError, adError]);
 
-    return (
-        <div className="min-h-screen bg-gray-900 text-white p-4">
-            <div className="flex">
-                <aside className="w-1/5 bg-gray-800 p-4 space-y-4">
-                    <div className="text-center">
-                        <img
-                            src="/profile.jpg"
-                            alt="User Profile"
-                            className="w-16 h-16 rounded-full mx-auto"
-                        />
-                        <h2 className="mt-2">Admin Name</h2>
-                    </div>
-                    <nav className="space-y-2">
-                        <a href="#" className="flex items-center text-gray-200 hover:text-white">
-                            <span className="material-icons mr-12 "></span> Dashboard
-                        </a>
-                        <a href="#" className="flex items-center text-gray-200 hover:text-white">
-                            <span className="material-icons mr-12"></span> Settings
-                        </a>
-                    </nav>
-                </aside>
+  // If data is still loading, show loading state
+  if (auctionLoading || storeLoading || adLoading) {
+    return <div>Loading...</div>;
+  }
 
-                <main className="w-4/5 p-6 space-y-6">
-                    <header className="flex justify-between items-center">
-                        <h1 className="text-2xl font-semibold">DASHBOARD</h1>
-                    </header>
+  // Graph data (using random data for simplicity)
+  const auctionData = {
+    labels: activeAuctions ? activeAuctions.map((auction) => auction.title) : [],
+    datasets: [
+      {
+        label: "Current Bid",
+        data: activeAuctions ? activeAuctions.map(() => Math.floor(Math.random() * 1000)) : [], // Randomized data for illustration
+        borderColor: "rgba(75,192,192,1)",
+        fill: false,
+      },
+    ],
+  };
 
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="bg-gray-800 p-4 rounded text-center">
-                            <p>Ads</p>
-                            <h2 className="text-2xl font-bold">12,361</h2>
-                        </div>
-                        <div className="bg-gray-800 p-4 rounded text-center">
-                            <p>Auction Data</p>
-                            <h2 className="text-2xl font-bold">431,225</h2>
-                        </div>
-                        <div className="bg-gray-800 p-4 rounded text-center">
-                            <p>Participants</p>
-                            <h2 className="text-2xl font-bold">32,441</h2>
-                        </div>
-                        <div className="bg-gray-800 p-4 rounded text-center">
-                            <p>Response Received</p>
-                            <h2 className="text-2xl font-bold">1,325,134</h2>
-                        </div>
-                    </div>
+  const storeData = {
+    labels: stores ? stores.map((store) => store.name) : [],
+    datasets: [
+      {
+        label: "Number of Ads",
+        data: stores ? stores.map((store) => store.ads.length) : [],
+        borderColor: "rgba(153,102,255,1)",
+        fill: false,
+      },
+    ],
+  };
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="bg-gray-800 p-6 rounded">
-                            <h2 className="text-lg font-semibold mb-4">Data -1</h2>
-                            <Line data={lineData} options={{ responsive: true }} />
-                        </div>
-                        <div className="bg-gray-800 p-6 rounded">
-                            <h2 className="text-lg font-semibold mb-4">Data -2</h2>
-                            <Bar data={barData} options={{ responsive: true }} />
-                        </div>
-                        <div className="col-span-1 bg-gray-800 p-6 rounded">
-                            <h2 className="text-lg font-semibold mb-4">Analysis</h2>
-                            <Pie data={pieData} options={{ responsive: true }} />
-                        </div>
-                    </div>
-                </main>
+  const adData = {
+    labels: ads ? ads.map((ad) => ad.title) : [],
+    datasets: [
+      {
+        label: "Ad Prices",
+        data: ads ? ads.map(() => Math.floor(Math.random() * 500)) : [], // Randomized data for illustration
+        borderColor: "rgba(255,159,64,1)",
+        fill: false,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Auction Bids Over Time',
+      },
+    },
+  };
+
+  return (
+    <div className="dashboard bg-zinc-800 min-h-screen text-white py-10">
+      <div className="container mx-auto space-y-10 px-4">
+        {/* Data Summary Boxes */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="glass-container p-6 rounded-xl shadow-xl backdrop-blur-md bg-white/30 border border-white/40">
+            <h3 className="text-lg text-gray-700 dark:text-white">Active Auctions</h3>
+            <div className="text-4xl font-semibold text-gray-900 dark:text-white">
+              {activeAuctions.length}
             </div>
+          </div>
+
+          <div className="glass-container p-6 rounded-xl shadow-xl backdrop-blur-md bg-white/30 border border-white/40">
+            <h3 className="text-lg text-gray-700 dark:text-white">My Stores</h3>
+            <div className="text-4xl font-semibold text-gray-900 dark:text-white">
+              {stores.length}
+            </div>
+          </div>
+
+          <div className="glass-container p-6 rounded-xl shadow-xl backdrop-blur-md bg-white/30 border border-white/40">
+            <h3 className="text-lg text-gray-700 dark:text-white">Active Ads</h3>
+            <div className="text-4xl font-semibold text-gray-900 dark:text-white">
+              {ads.length}
+            </div>
+          </div>
         </div>
-    );
+
+        {/* Graphs Section */}
+        <section className="graphs-container mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {/* Graph 1: Auction Bids */}
+          <div className="graph-container bg-zinc-900 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-5">Auction Bids Over Time</h2>
+            <div className="w-full h-72 md:h-96">
+              <Line data={auctionData} options={options} />
+            </div>
+          </div>
+
+          {/* Graph 2: Store Ads */}
+          <div className="graph-container bg-zinc-900 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-5">Store Ads Over Time</h2>
+            <div className="w-full h-72 md:h-96">
+              <Line data={storeData} options={options} />
+            </div>
+          </div>
+
+          {/* Graph 3: Ad Prices */}
+          <div className="graph-container bg-zinc-900 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-5">Ad Prices Over Time</h2>
+            <div className="w-full h-72 md:h-96">
+              <Line data={adData} options={options} />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 };
 
-export default dashboard;
+export default Dashboard;
