@@ -1,17 +1,24 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import useAd from "@/hooks/useAd";
-import ReviewList from "@/components/Ads/components/ReviewList";
 import ReviewForm from "@/components/Ads/components/ReviewForm";
+import ReviewList from "@/components/Ads/components/ReviewList";
+import RatingForm from "@/components/Ads/RatingForm";
+import { useAuthContext } from "@/context/AuthContext";
+import useAd from "@/hooks/useAd";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const IndividualAdPage = () => {
+  const { auth } = useAuthContext();
   const { adId } = useParams();
   const { adDetails, getIndividualAd, buyAd, verifyAndMarkAsSold, loading, error } = useAd();
   const [reviewsUpdated, setReviewsUpdated] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  // when come to page first take rating of product from user
+  const [rating, setRating] = useState(null); 
 
+  const userId = auth?._id
+  
   // Load Razorpay script only once
   useEffect(() => {
     if (!razorpayLoaded) {
@@ -75,6 +82,10 @@ const IndividualAdPage = () => {
 
       await verifyAndMarkAsSold(adId, paymentResult.razorpay_order_id, paymentResult.razorpay_payment_id, paymentResult.razorpay_signature);
       console.log("Ad marked as sold after successful payment.");
+      // now interaction of buy now is making
+      await makeInteraction({ userId, prductId: adId, interaction_type: 'purchase' ,rating:rating});
+      console.log("Interaction of user recorded");
+      
       toast.success("Purchase successful! Ad has been marked as sold.");
     } catch (err) {
       console.error("Error during purchase process:", err);
@@ -123,6 +134,24 @@ const IndividualAdPage = () => {
     });
   };
 
+  // when come to this page a click event is recorded
+  
+  
+  const handleRatingSubmitted = (newRating) => {
+    setRating(newRating);
+    makeInteraction({ userId, prductId: adId, interaction_type: 'click',rating:newRating });
+  
+    console.log(`User rated: ${newRating} stars`);
+    // Optionally, you can send this rating to the backend here
+  };
+
+  if (rating==null) {
+    return (
+    <div className="flex flex-col items-center justify-center">
+        <RatingForm onRatingSubmitted={handleRatingSubmitted}  />
+      </div>
+  )
+}
   if (loading) return <p className="text-center text-lg text-gray-600">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 

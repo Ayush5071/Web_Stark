@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import { useState } from "react";
 
 const useAd = () => {
@@ -231,9 +232,23 @@ const useAd = () => {
     }
   };
 
+  const makeInteraction = async(userId, prductId, interaction_type) => {
+    setLoading(true);
+    try {
+      const response = await axios.post('http://localhost:4000/api/interaction/capture-interaction',{userId,prductId,interaction_type})
+
+    } catch (err) {
+      setError(err.message || "Error in making interaction");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return {
     ads,
     myAds,
+    makeInteraction,
     purchasedAds,
     activeAds,
     adDetails,
