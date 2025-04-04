@@ -32,19 +32,7 @@ Hence, **Campus X** was born — A full-fledged, secure, and real-time marketpla
 ---
 
 ## 💡 Our Solution — Campus X
-
-We designed **Campus X** to solve the above problems by providing:
-
-✅ A secure authentication system with OTP to restrict access to verified students only.  
-✅ A Lost & Found section dedicated to recovering or reporting lost belongings.  
-✅ A live auction system enabling students to bid fairly and transparently.  
-✅ Personal storefronts for clubs or groups to list & manage their products.  
-✅ Real-time chat & notifications for smooth communication between buyers and sellers.  
-✅ AI-based recommendation system to suggest relevant products automatically.  
-✅ Analytical dashboards with meaningful insights for users.  
-✅ Multi-language support for inclusiveness across diverse student populations.
-
-Campus X = Buy | Sell | Bid | Chat | Find | Pay — All in one app, tailored for your campus! 🎓
+![ChatGPT Image Apr 4, 2025, 12_06_38 PM](https://github.com/user-attachments/assets/92fdd803-3769-4590-92a8-a36272929e2f)
 
 ---
 
