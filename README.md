@@ -90,20 +90,18 @@ graph TD
 
 ## 💻 Tech Stack
 
-### 🎨 Frontend:
-- React.js, Next.js, Tailwind CSS  
-- React Chart.js
+| 🎨 Frontend         | 🔧 Backend                          | 🧠 AI/ML         |
+|--------------------|-------------------------------------|------------------|
+| React.js           | Node.js                             | Flask            |
+| Next.js            | Express.js                          | NumPy            |
+| Tailwind CSS       | MongoDB                             | Pandas           |
+| React Chart.js     | JWT Authentication                  | KNN Algorithm    |
+|                    | Nodemailer                          |                  |
+|                    | Cloudinary                          |                  |
+|                    | Razorpay                            |                  |
+|                    | Socket.io                           |                  |
+|                    | Node-Cron                           |                  |
 
-### 🔧 Backend:
-- Node.js, Express.js, MongoDB  
-- JWT Authentication  
-- Nodemailer, Cloudinary, Razorpay, Socket.io, Node-Cron
-
-### 🧠 AI:
-- Flask  
-- NumPy  
-- Pandas  
-- KNN Algorithm
 
 ---
 
